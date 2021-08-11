@@ -61,6 +61,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'users',
+    'posts',
 ]
 
 MIDDLEWARE = [
@@ -107,7 +109,7 @@ DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
-
+AUTH_USER_MODEL = "users.User"
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -148,3 +150,5 @@ django_heroku.settings(locals())
 # SSL issue workaround for local development (https://blog.usejournal.com/deploying-django-to-heroku-connecting-heroku-postgres-fcc960d290d1)
 options = DATABASES['default'].get('OPTIONS', {})
 options.pop('sslmode', None)
+
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
