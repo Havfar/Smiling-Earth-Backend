@@ -1,18 +1,18 @@
 from django.contrib.auth.models import Group
 from rest_framework import viewsets
 from rest_framework import permissions
-from users.serializers import UserSerializer
+from users.serializers import UserSerializer, UserDetailedSerializer
 from django.contrib.auth import get_user_model
+from rest_framework import generics, mixins
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
+class UserList(generics.ListAPIView):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
+class UserDetail(generics.RetrieveAPIView):
+    queryset = get_user_model().objects.all()
+    serializer_class = UserDetailedSerializer
 
 # class GroupViewSet(viewsets.ModelViewSet):
 #     """
