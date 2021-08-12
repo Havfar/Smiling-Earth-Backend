@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-
-# Create your models here.
 class Post(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
@@ -13,4 +11,9 @@ class Post(models.Model):
     class Meta:
         ordering = ['timestamp']
 
-
+class Like(models.Model):
+    timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, related_name="likes"
+    )
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="likes")
