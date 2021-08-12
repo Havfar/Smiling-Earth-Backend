@@ -12,14 +12,7 @@ class PostSerializer(HyperlinkedModelSerializer):
 
 class LikeSerializer(HyperlinkedModelSerializer): 
     user = serializers.ReadOnlyField(source = 'user.email')
-    # post = HyperlinkedRelatedField(
-    #     queryset=Post.objects.all(), view_name="like-list"
-    # )
     post = serializers.ReadOnlyField(source = 'post.id')
-
-
-    # post = serializers.ReadOnlyField(source = 'post.id')
-    
     class Meta: 
         model = Like
         fields = ['id', 'user', 'post', 'timestamp']
