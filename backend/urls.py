@@ -27,6 +27,8 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('', include('posts.urls')),
     path('', include('challenges.urls')),
+    path('', include('activities.urls')),
+    
     path('users/', views.UserList.as_view(), name="user lists"),
     path('users/<int:pk>/', views.UserDetail.as_view(), name="user details"),
 ]

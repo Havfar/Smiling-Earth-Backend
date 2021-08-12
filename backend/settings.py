@@ -63,7 +63,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'users',
     'posts',
-    'challenges'
+    'challenges',
+    'activities',
 ]
 
 MIDDLEWARE = [
