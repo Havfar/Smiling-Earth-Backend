@@ -19,8 +19,6 @@ from rest_framework import routers
 from users import views
 
 router = routers.DefaultRouter()
-# Wire up our API using automatic URL routing.
-# Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
@@ -28,7 +26,5 @@ urlpatterns = [
     path('', include('posts.urls')),
     path('', include('challenges.urls')),
     path('', include('activities.urls')),
-    
-    path('users/', views.UserList.as_view(), name="user lists"),
-    path('users/<int:pk>/', views.UserDetail.as_view(), name="user details"),
+    path('', include('users.urls')),
 ]

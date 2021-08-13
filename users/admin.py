@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import User
+from .models import Follower, User, Profile
 from django.contrib.auth import get_user_model
 
 
@@ -26,4 +26,6 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('email',)
 
 
+admin.site.register(Profile)
+admin.site.register(Follower)
 admin.site.register(User, CustomUserAdmin)
