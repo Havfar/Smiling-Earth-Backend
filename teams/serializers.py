@@ -1,6 +1,6 @@
 from django.db.models import fields
 from rest_framework import serializers
-from teams.models import Team, Member
+from teams.models import Rival, Team, Member
 from users.models import User
 from django.shortcuts import get_object_or_404
 
@@ -42,3 +42,12 @@ class LeaveTeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
         fields = ['user','team']
+
+class RivalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rival
+        fields = [
+            'sender',
+            'receiver',
+            'status'
+        ]

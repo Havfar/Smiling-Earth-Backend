@@ -31,3 +31,19 @@ class Member(models.Model):
     def get_user_is_member_of(self):
         return Member.objects.filter(user = self.user)
     
+class Rival(models.Model):
+    sender = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='sender')
+    receiver = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='receiver')
+    
+    ACCEPTED = "a"
+    PENDING = "p"
+    DECLINED = "d"
+    STATUS_CHOICES = (
+        (ACCEPTED, "Accepted"),
+        (PENDING, "Pending"),
+        (DECLINED, "Declined"),
+    )
+
+    status = models.CharField(max_length=8, choices=STATUS_CHOICES, default=PENDING)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
