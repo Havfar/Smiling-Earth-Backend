@@ -20,3 +20,5 @@ class MembersOfTeam(generics.ListCreateAPIView):
         team = get_object_or_404(Team, pk = self.kwargs["pk"])
         return Member.objects.all()
         # return Member.objects.filter(team = team)
+    
+# class Join(generics.crea)
