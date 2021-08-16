@@ -16,7 +16,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
-from users import views
 
 router = routers.DefaultRouter()
 urlpatterns = [
@@ -27,4 +26,5 @@ urlpatterns = [
     path('', include('challenges.urls')),
     path('', include('activities.urls')),
     path('', include('users.urls')),
+    path('', include('teams.urls')),
 ]

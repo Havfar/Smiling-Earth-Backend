@@ -17,12 +17,12 @@ class ProfileDetailedSerializer(serializers.HyperlinkedModelSerializer):
 
 class FollowerSerializer(serializers.ModelSerializer):
     user = serializers.DictField(child = serializers.CharField(), source = 'get_user_info', read_only = True)
-    is_followed_by = serializers.DictField(child = serializers.CharField(), source = 'get_is_followed_by_info', read_only = True)
+    # is_followed_by = serializers.DictField(child = serializers.CharField(), source = 'get_is_followed_by_info', read_only = True)
 
     class Meta:
         model = Follower
-        fields = ('user', 'is_followed_by')
-        read_only_fields = ('user', 'is_followed_by')
+        fields = ['user']
+        read_only_fields = ['user']
 
 
 # class GroupSerializer(serializers.HyperlinkedModelSerializer):

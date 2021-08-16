@@ -6,7 +6,7 @@ class Post(models.Model):
     user = models.ForeignKey(
         get_user_model(), on_delete=models.CASCADE, related_name="posts"
     )
-    content = models.TextField()
+    content = models.CharField(max_length=300)
 
     class Meta:
         ordering = ['timestamp']
