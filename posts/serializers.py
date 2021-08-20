@@ -13,29 +13,31 @@ class PostSerializer(HyperlinkedModelSerializer):
         model = Post
         fields = ['id', 'user', 'content', 'timestamp', 'likes_count', 'comments_count']
 
-class LikeSerializer(ModelSerializer): 
+class LikesSerializer(ModelSerializer): 
     user = serializers.ReadOnlyField(source = 'user.email')
     post = serializers.ReadOnlyField(source = 'post.id')
     class Meta: 
-        model = Comment
+        model = Like
         fields = ['id', 'user', 'post', 'timestamp']
 
 class LikePostSerializer(ModelSerializer): 
+
     class Meta: 
-        model = Comment
+        model = Like
         fields = ['id', 'user', 'post', 'timestamp']
 
 class CommentSerializer(ModelSerializer): 
     user = serializers.ReadOnlyField(source = 'user.email')
     post = serializers.ReadOnlyField(source = 'post.id')
+
+    def validate(self, attrs):
+        print(attrs)
+        return super().validate(attrs)
     class Meta: 
         model = Comment
         fields = ['id', 'user', 'post', 'timestamp', 'content']
 
 class CommentPostSerializer(ModelSerializer): 
-    # user = serializers.ReadOnlyField(source = 'user.email')
-    # post = serializers.ReadOnlyField(source = 'post.id')
-    # post = serializers.IntegerField(source = 'post.id')
     class Meta: 
         model = Comment
         fields = ['id', 'user', 'post', 'timestamp', 'content']
