@@ -13,14 +13,14 @@ class IsAllowedToViewPost(permissions.BasePermission):
         user = User.objects.get(id=request.data["user"])
         post = Post.objects.get(id=request.data["post"])
 
-        followersQueryset = Follower.objects.filter(is_followed_by = user)
-        followers = [ user.id for user in followersQueryset ]
+        followers_queryset = Follower.objects.filter(is_followed_by = user)
+        followers = [ user.id for user in followers_queryset ]
 
         author = post.user.id
         return author in followers
 
     def has_object_permission(self, request, view, obj):
-        followersQueryset = Follower.objects.filter(is_followed_by = request.user)
-        followers = [ user for user in followersQueryset ]
+        followers_queryset = Follower.objects.filter(is_followed_by = request.user)
+        followers = [ user for user in followers_queryset ]
         author = obj.post.user
         return False

@@ -1,14 +1,20 @@
 from django.contrib.auth import get_user_model
+from django.db.models import fields
 from rest_framework import serializers
 from users.models import Follower, Profile
 
+class UserSerializer(serializers.ModelSerializer):
+    # TODO: Legg til profil ID
+    class Meta:
+        model = get_user_model()
+        fields = ['id'] 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ['id']
+        fields = ['id', 'first_name', 'last_name', 'user']
 
-class ProfileDetailedSerializer(serializers.HyperlinkedModelSerializer):
+class ProfileDetailedSerializer(serializers.ModelSerializer):
     followers_count = serializers.IntegerField(source = 'get_followers_count')
     email = serializers.CharField(source='get_email')
     class Meta:
@@ -23,9 +29,3 @@ class FollowerSerializer(serializers.ModelSerializer):
         model = Follower
         fields = ['user']
         read_only_fields = ['user']
-
-
-# class GroupSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = Group
-#         fields = ['url', 'name']
