@@ -4,13 +4,13 @@ from teams.models import Rival, Team, Member
 from users.models import User
 from django.shortcuts import get_object_or_404
 
-class TeamSerializer(serializers.HyperlinkedModelSerializer):
+class TeamSerializer(serializers.ModelSerializer):
     members_count = serializers.IntegerField(source = 'get_members_count')
     class Meta:
         model = Team
         fields = ['id','name', 'members_count']
 
-class TeamDetailSerializer(serializers.HyperlinkedModelSerializer):
+class TeamDetailSerializer(serializers.ModelSerializer):
     # admin = #TODO
     class Meta:
         model = Team
