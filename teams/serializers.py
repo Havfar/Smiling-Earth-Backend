@@ -12,10 +12,9 @@ class TeamSerializer(serializers.ModelSerializer):
 
 
 class TeamDetailSerializer(serializers.ModelSerializer):
-    # admin = #TODO
     class Meta:
         model = Team
-        fields = ['id', 'name', 'description']
+        fields = ['id', 'name', 'description', 'admin', 'location']
 
 
 class MemberSerializer(serializers.ModelSerializer):

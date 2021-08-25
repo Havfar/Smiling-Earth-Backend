@@ -4,6 +4,7 @@ from rest_framework import generics, mixins, permissions
 from users.permissions import IsOwner
 
 from teams.models import Member, Rival, Team
+from teams.permissions import IsTeamAdmin
 from teams.serializers import (JoinTeamSerializer, LeaveTeamSerializer,
                                MemberSerializer, RivalSerializer,
                                TeamDetailSerializer, TeamSerializer)
@@ -15,10 +16,10 @@ class TeamList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class TeamDetail(generics.RetrieveAPIView):
+class TeamDetail(generics.RetrieveUpdateAPIView):
     queryset = Team.objects.all()
     serializer_class = TeamDetailSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsTeamAdmin]
 
 
 class MembersOfTeam(generics.ListCreateAPIView):
