@@ -1,15 +1,14 @@
 from rest_framework import serializers
-from rest_framework.serializers import (HyperlinkedModelSerializer,
-                                        ModelSerializer)
+from rest_framework.serializers import ModelSerializer
 
 from posts.models import Comment, Like, Post
 
 
-class PostSerializer(HyperlinkedModelSerializer):
+class PostSerializer(ModelSerializer):
     user = serializers.ReadOnlyField(source="user.email")
     content = serializers.CharField()
-    likes_count = serializers.IntegerField(source='get_likes_count')
-    comments_count = serializers.IntegerField(source='get_comments_count')
+    likes_count = serializers.ReadOnlyField(source='get_likes_count')
+    comments_count = serializers.ReadOnlyField(source='get_comments_count')
 
     class Meta:
         model = Post
