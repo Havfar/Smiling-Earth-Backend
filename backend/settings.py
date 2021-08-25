@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
-import django_heroku
 import os
+import django_heroku
 import dj_database_url
 import dotenv
 
@@ -21,7 +21,8 @@ import dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 
-# Setup dotenv from tutorial: https://blog.usejournal.com/deploying-django-to-heroku-connecting-heroku-postgres-fcc960d290d1
+# Setup dotenv from tutorial:
+# https://blog.usejournal.com/deploying-django-to-heroku-connecting-heroku-postgres-fcc960d290d1
 dotenv_file = os.path.join(BASE_DIR, ".env")
 if os.path.isfile(dotenv_file):
     dotenv.load_dotenv(dotenv_file)
@@ -62,7 +63,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'users',
+    'teams',
     'posts',
+    'challenges',
+    'activities',
+    'pledge',
 ]
 
 MIDDLEWARE = [
@@ -147,7 +152,8 @@ USE_TZ = True
 # Configure Django App for Heroku.
 django_heroku.settings(locals())
 
-# SSL issue workaround for local development (https://blog.usejournal.com/deploying-django-to-heroku-connecting-heroku-postgres-fcc960d290d1)
+# SSL issue workaround for local development
+# (https://blog.usejournal.com/deploying-django-to-heroku-connecting-heroku-postgres-fcc960d290d1)
 options = DATABASES['default'].get('OPTIONS', {})
 options.pop('sslmode', None)
 
