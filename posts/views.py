@@ -18,6 +18,9 @@ class PostList(generics.ListCreateAPIView):
     def get_queryset(self):
         return get_posts_queryset(self.request.user)
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsOwner]
@@ -26,17 +29,14 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class Likes(generics.CreateAPIView):
-    permission_classes = [permissions.IsAuthenticated and IsAllowedToViewPost]
+    permission_classes = [permissions.IsAuthenticated, IsAllowedToViewPost]
     serializer_class = LikePostSerializer
 
     def create(self, request, *args, **kwargs):
-        user = request.data['user']
+        user = request.user
         post = request.data['post']
-        try:
-            already_liked = Like.objects.get(user=user, post=post)
-            return Response({"Message": "Already liked"}, status=status.HTTP_200_OK)
-        except:
-            return super().create(request, *args, **kwargs)
+        like, created = Like.objects.get_or_create(user=user, post=post)
+        return Response({"Liked": {"id": like.id, "user": like.user.id, "post": like.post.id}}, status=status.HTTP_201_CREATED)
 
 
 class LikeList(generics.ListAPIView):
