@@ -1,4 +1,5 @@
 from django.urls import path
+
 from teams import views
 
 urlpatterns = [
@@ -9,4 +10,4 @@ urlpatterns = [
     path('leave_team/<int:pk>', views.Leave.as_view()),
     path('rivals/<int:pk>', views.Rivals.as_view()),
     path('rival_requests/<int:pk>', views.RivalRequests.as_view())
-    ]
+]

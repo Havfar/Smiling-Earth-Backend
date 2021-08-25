@@ -14,7 +14,13 @@ class Activity(models.Model):
     )
     title = CharField(max_length=200)
     description = TextField(null=True)
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
+    start_time = DateTimeField()
+    end_time = DateTimeField()
     activity_enum_value = models.IntegerField(default=Activities.WALK.value)
-    tag = models.ForeignKey(ActivityTag, on_delete=models.SET_NULL, related_name='activity_tag', blank=True, null=True)
+    tag = models.ForeignKey(
+        ActivityTag,
+        on_delete=models.SET_NULL,
+        related_name='activity_tag',
+        blank=True,
+        null=True
+        )

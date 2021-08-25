@@ -1,4 +1,5 @@
 from django.urls import path
+
 from posts import views
 
 urlpatterns = [
@@ -7,7 +8,7 @@ urlpatterns = [
     path('likes', views.Likes.as_view()),
     path('likes/post/<int:pk>', views.LikeList.as_view()),
     path('likes/<int:pk>', views.LikeDelete.as_view()),
-    path('comment', views.Comment.as_view()),
+    path('comment', views.NewComment.as_view()),
     path('comments/<int:pk>', views.CommentsDelete.as_view()),
     path('comments/<int:pk>', views.CommentList.as_view())
 ]

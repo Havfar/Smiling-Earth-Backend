@@ -1,4 +1,5 @@
 from django.urls import path
+
 from users import views
 
 urlpatterns = [
@@ -7,5 +8,4 @@ urlpatterns = [
     path('followers/<int:pk>/', views.Followers.as_view(), name="followers"),
     path('following/<int:pk>/', views.Following.as_view(), name='following'),
     path('follow/<int:pk>/', views.follow, name='follow'),
-
 ]

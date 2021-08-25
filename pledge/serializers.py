@@ -1,6 +1,5 @@
-from django.db.models.base import Model
-from pledge.models import Pledge, UserPledge
 from rest_framework.serializers import ModelSerializer
+from pledge.models import Pledge, UserPledge
 
 
 class PledgeSerializer(ModelSerializer):
@@ -8,7 +7,8 @@ class PledgeSerializer(ModelSerializer):
         model = Pledge
         fields = ['id', 'title', 'description', 'color', 'icon']
 
+
 class UserPledgeSerializer(ModelSerializer):
     class Meta:
         model = UserPledge
-        fields = ['id', 'pledge','user']
+        fields = ['id', 'pledge', 'user']

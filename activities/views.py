@@ -1,7 +1,6 @@
-from django.shortcuts import render
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from activities.models import Activity, ActivityTag
+from activities.models import Activity
 from activities.serializers import ActivitySerializerGet, ActivitySerializerPut
 from users.permissions import IsFollowingOrOwner, IsOwner
 
@@ -13,7 +12,7 @@ class ActivityList(generics.ListCreateAPIView):
         return Activity.objects.filter(user = self.request.user)
 
     def perform_create(self, serializer):
-        return serializer.save(user = self.request.user)  
+        return serializer.save(user = self.request.user)
 
 class ActivityListOfUser(generics.ListAPIView):
     serializer_class = ActivitySerializerGet
@@ -25,7 +24,7 @@ class ActivityListOfUser(generics.ListAPIView):
 class ActivityDetailed(generics.RetrieveUpdateDestroyAPIView):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializerPut
-    permission_classes = [permissions.IsAuthenticated, IsOwner] 
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -44,5 +43,4 @@ class ActivityDetailed(generics.RetrieveUpdateDestroyAPIView):
         if serializer.is_valid():
             serializer.save()
             return Response(status=status.HTTP_200_OK)
-        else:
-            return Response({"message": "Could not update activity", "details": serializer.errors})
+        return Response({"message": "Could not update activity", "details": serializer.errors})
