@@ -1,5 +1,9 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
+from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
+from users.models import Profile
+from users.serializers import ProfileSerializer
 
 
 class Post(models.Model):
@@ -12,8 +16,24 @@ class Post(models.Model):
     def get_likes_count(self):
         return Like.objects.filter(post=self).count()
 
+    def get_likes(self):
+        likes = Like.objects.get(post=self)
+        print(likes)
+        serializer = _LikesSerializer(instance=likes)
+        return serializer.data
+
     def get_comments_count(self):
         return Comment.objects.filter(post=self).count()
+
+    def get_comments(self):
+        comments = Comment.objects.filter(post=self)
+        serializer = _CommentSerializer(comments, many=True)
+        return serializer.data
+
+    def get_owner(self):
+        user = Profile.objects.get(user=self.user)
+        serializer = ProfileSerializer(instance=user)
+        return serializer.data
 
     class Meta:
         ordering = ['timestamp']
@@ -27,6 +47,15 @@ class Like(models.Model):
     post = models.ForeignKey(
         Post, on_delete=models.CASCADE, related_name="post")
 
+    def get_owner(self):
+        user = Profile.objects.get(user=self.user)
+        serializer = ProfileSerializer(instance=user)
+        return serializer.data
+
+    # staticmethod getLikes(Post post){
+    #     return ""
+    # }
+
 
 class Comment(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -36,3 +65,28 @@ class Comment(models.Model):
     post = models.ForeignKey(
         Post, on_delete=models.CASCADE, related_name="comment")
     content = models.CharField(max_length=300)
+
+    def get_owner(self):
+        user = Profile.objects.get(user=self.user)
+        serializer = ProfileSerializer(instance=user)
+        return serializer.data
+
+
+# Creating a private like serializer to prevent circular import error
+class _LikesSerializer(ModelSerializer):
+
+    user = serializers.ReadOnlyField(source='get_owner')
+
+    class Meta:
+        model = Like
+        depth = 1
+        fields = ['id', 'user', 'timestamp']
+
+
+class _CommentSerializer(ModelSerializer):
+    user = serializers.ReadOnlyField(source='get_owner')
+
+    class Meta:
+        depth = 1
+        model = Comment
+        fields = ['id', 'user', 'timestamp', 'content']

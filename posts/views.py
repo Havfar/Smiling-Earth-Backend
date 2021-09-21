@@ -8,7 +8,7 @@ from posts.models import Comment, Like, Post
 from posts.permissions import IsAllowedToViewPost, IsOwner
 from posts.serializers import (CommentPostSerializer, CommentSerializer,
                                LikePostSerializer, LikesSerializer,
-                               PostSerializer)
+                               PostDetailedSerializer, PostSerializer)
 
 
 class PostList(generics.ListCreateAPIView):
@@ -25,7 +25,7 @@ class PostList(generics.ListCreateAPIView):
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsOwner]
     queryset = Post.objects.all()
-    serializer_class = PostSerializer
+    serializer_class = PostDetailedSerializer
 
 
 class Likes(generics.CreateAPIView):
