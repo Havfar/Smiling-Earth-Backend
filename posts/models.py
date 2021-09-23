@@ -17,7 +17,7 @@ class Post(models.Model):
         return Like.objects.filter(post=self).count()
 
     def get_likes(self):
-        likes = Like.objects.get(post=self)
+        likes = Like.objects.filter(post=self)
         print(likes)
         serializer = _LikesSerializer(instance=likes)
         return serializer.data
@@ -64,6 +64,7 @@ class Comment(models.Model):
     )
     post = models.ForeignKey(
         Post, on_delete=models.CASCADE, related_name="comment")
+
     content = models.CharField(max_length=300)
 
     def get_owner(self):

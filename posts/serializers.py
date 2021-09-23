@@ -27,13 +27,14 @@ class PostDetailedSerializer(ModelSerializer):
     class Meta:
         depth = 1
         model = Post
-        fields = ['id', 'user', 'content', 'timestamp', 'likes', 'comments']
+        fields = ['id', 'user', 'content', 'timestamp',
+                  'likes', 'comments']
 
 
 class LikesSerializer(ModelSerializer):
 
     user = serializers.ReadOnlyField(source='get_owner')
-    # post = serializers.ReadOnlyField(source='post.id')
+    post = serializers.ReadOnlyField(source='post.id')
 
     class Meta:
         model = Like
@@ -48,6 +49,21 @@ class LikePostSerializer(ModelSerializer):
         depth = 1
 
         fields = ['id', 'user', 'post', 'timestamp']
+
+
+class LikesLikedSerializer(ModelSerializer):
+    class Meta:
+        model = Like
+        depth = 1
+        fields = ['id', 'user_id', 'post_id', ]
+
+
+class LikePostResponseSerializer(ModelSerializer):
+
+    class Meta:
+        model = Like
+
+        fields = ['id', 'user', 'post']
 
 
 class CommentSerializer(ModelSerializer):
@@ -65,6 +81,9 @@ class CommentSerializer(ModelSerializer):
 
 
 class CommentPostSerializer(ModelSerializer):
+
+    post = serializers.ReadOnlyField(source='post.id')
+
     class Meta:
         depth = 1
         model = Comment
