@@ -8,38 +8,39 @@ from posts.models import Comment, Like, Post
 class PostSerializer(ModelSerializer):
     user = serializers.ReadOnlyField(source="get_owner")
     content = serializers.CharField()
-    likes_count = serializers.ReadOnlyField(source='get_likes_count')
-    comments_count = serializers.ReadOnlyField(source='get_comments_count')
+    likes_count = serializers.ReadOnlyField(source="get_likes_count")
+    comments_count = serializers.ReadOnlyField(source="get_comments_count")
+    activity = serializers.ReadOnlyField(source="get_activity", required=False)
 
     class Meta:
         depth = 1
         model = Post
-        fields = ['id', 'user', 'content', 'timestamp',
-                  'likes_count', 'comments_count']
+        fields = ["id", "user", "content", "timestamp",
+                  "likes_count", "comments_count", "activity"]
 
 
 class PostDetailedSerializer(ModelSerializer):
     user = serializers.ReadOnlyField(source="get_owner")
     content = serializers.CharField()
-    likes = serializers.ReadOnlyField(source='get_likes')
-    comments = serializers.ReadOnlyField(source='get_comments')
+    likes = serializers.ReadOnlyField(source="get_likes")
+    comments = serializers.ReadOnlyField(source="get_comments")
 
     class Meta:
         depth = 1
         model = Post
-        fields = ['id', 'user', 'content', 'timestamp',
-                  'likes', 'comments']
+        fields = ["id", "user", "content", "timestamp",
+                  "likes", "comments"]
 
 
 class LikesSerializer(ModelSerializer):
 
-    user = serializers.ReadOnlyField(source='get_owner')
-    post = serializers.ReadOnlyField(source='post.id')
+    user = serializers.ReadOnlyField(source="get_owner")
+    post = serializers.ReadOnlyField(source="post.id")
 
     class Meta:
         model = Like
         depth = 1
-        fields = ['id', 'user', 'post', 'timestamp']
+        fields = ["id", "user", "post", "timestamp"]
 
 
 class LikePostSerializer(ModelSerializer):
@@ -48,14 +49,14 @@ class LikePostSerializer(ModelSerializer):
         model = Like
         depth = 1
 
-        fields = ['id', 'user', 'post', 'timestamp']
+        fields = ["id", "user", "post", "timestamp"]
 
 
 class LikesLikedSerializer(ModelSerializer):
     class Meta:
         model = Like
         depth = 1
-        fields = ['id', 'user_id', 'post_id', ]
+        fields = ["id", "user_id", "post_id", ]
 
 
 class LikePostResponseSerializer(ModelSerializer):
@@ -63,12 +64,12 @@ class LikePostResponseSerializer(ModelSerializer):
     class Meta:
         model = Like
 
-        fields = ['id', 'user', 'post']
+        fields = ["id", "user", "post"]
 
 
 class CommentSerializer(ModelSerializer):
-    user = serializers.ReadOnlyField(source='get_owner')
-    # post = serializers.ReadOnlyField(source='post.id')
+    user = serializers.ReadOnlyField(source="get_owner")
+    # post = serializers.ReadOnlyField(source="post.id")
 
     def validate(self, attrs):
         print(attrs)
@@ -77,14 +78,14 @@ class CommentSerializer(ModelSerializer):
     class Meta:
         depth = 1
         model = Comment
-        fields = ['id', 'user', 'post', 'timestamp', 'content']
+        fields = ["id", "user", "post", "timestamp", "content"]
 
 
 class CommentPostSerializer(ModelSerializer):
 
-    post = serializers.ReadOnlyField(source='post.id')
+    post = serializers.ReadOnlyField(source="post.id")
 
     class Meta:
         depth = 1
         model = Comment
-        fields = ['id', 'user', 'post', 'timestamp', 'content']
+        fields = ["id", "user", "post", "timestamp", "content"]

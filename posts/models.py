@@ -1,3 +1,5 @@
+from activities.models import Activity
+from activities.serializers import ActivitySerializer, ActivitySerializerGet
 from django.contrib.auth import get_user_model
 from django.db import models
 from rest_framework import serializers
@@ -12,14 +14,16 @@ class Post(models.Model):
         get_user_model(), on_delete=models.CASCADE, related_name="posts"
     )
     content = models.CharField(max_length=300)
+    activity = models.ForeignKey(
+        Activity, default=None, null=True, on_delete=models.CASCADE, related_name="posts"
+    )
 
     def get_likes_count(self):
         return Like.objects.filter(post=self).count()
 
     def get_likes(self):
         likes = Like.objects.filter(post=self)
-        print(likes)
-        serializer = _LikesSerializer(instance=likes)
+        serializer = _LikesSerializer(instance=likes, many=True)
         return serializer.data
 
     def get_comments_count(self):
@@ -34,6 +38,12 @@ class Post(models.Model):
         user = Profile.objects.get(user=self.user)
         serializer = ProfileSerializer(instance=user)
         return serializer.data
+
+    def get_activity(self):
+        if self.activity != None:
+            serializer = ActivitySerializerGet(instance=self.activity)
+            return serializer.data
+        return None
 
     class Meta:
         ordering = ['timestamp']

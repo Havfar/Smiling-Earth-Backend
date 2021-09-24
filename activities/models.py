@@ -1,18 +1,21 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.fields import CharField, DateTimeField, TextField
-from django.contrib.auth import get_user_model
+
 from activities.activities import Activities
 
+
 class ActivityTag(models.Model):
-    title = CharField(max_length=200)
+    title = TextField(max_length=200)
+
 
 class Activity(models.Model):
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name='Activities'
+        related_name="Activities"
     )
-    title = CharField(max_length=200)
+    title = TextField(max_length=200)
     description = TextField(null=True)
     start_time = DateTimeField()
     end_time = DateTimeField()
@@ -20,7 +23,7 @@ class Activity(models.Model):
     tag = models.ForeignKey(
         ActivityTag,
         on_delete=models.SET_NULL,
-        related_name='activity_tag',
+        related_name="activity_tag",
         blank=True,
         null=True
-        )
+    )
