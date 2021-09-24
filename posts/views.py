@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.http import request
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
@@ -7,8 +8,9 @@ from users.models import Follower
 from posts.models import Comment, Like, Post
 from posts.permissions import IsAllowedToViewPost, IsOwner
 from posts.serializers import (CommentPostSerializer, CommentSerializer,
-                               LikePostSerializer, LikesSerializer,
-                               PostSerializer)
+                               LikePostResponseSerializer, LikePostSerializer,
+                               LikesLikedSerializer, LikesSerializer,
+                               PostDetailedSerializer, PostSerializer)
 
 
 class PostList(generics.ListCreateAPIView):
@@ -23,20 +25,30 @@ class PostList(generics.ListCreateAPIView):
 
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsOwner]
+    # permission_classes = [IsOwner]
     queryset = Post.objects.all()
-    serializer_class = PostSerializer
+    serializer_class = PostDetailedSerializer
+
+
+class Liked(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = LikesLikedSerializer
+
+    def get_queryset(self):
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        user = self.request.user
+        return Like.objects.filter(post=post, user=user)
 
 
 class Likes(generics.CreateAPIView):
-    permission_classes = [permissions.IsAuthenticated, IsAllowedToViewPost]
+    # permission_classes = [permissions.IsAuthenticated, IsAllowedToViewPost]
     serializer_class = LikePostSerializer
 
     def create(self, request, *args, **kwargs):
         user = request.user
-        post = request.data['post']
+        post = get_object_or_404(Post, pk=request.data['post'])
         like, created = Like.objects.get_or_create(user=user, post=post)
-        return Response({"Liked": {"id": like.id, "user": like.user.id, "post": like.post.id}}, status=status.HTTP_201_CREATED)
+        return Response(LikesSerializer(instance=like).data, status=status.HTTP_201_CREATED)
 
 
 class LikeList(generics.ListAPIView):
@@ -53,14 +65,35 @@ class LikeDelete(generics.DestroyAPIView):
     serializer_class = LikesSerializer
 
     def get_queryset(self):
-        queryset = Like.objects.filter(
-            user=self.request.user, id=self.kwargs['pk'])
+        queryset = Like.objects.filter(id=self.kwargs["pk"])
         return queryset
+
+    # def destroy(self, request, *args, **kwargs):
+    #     try:
+    #         post = get_object_or_404(Post, pk=self.kwargs["pk"])
+    #         user = request.user
+    #         l = Like.objects.filter(
+    #             user=self.request.user, post=post)
+    #         like = get_object_or_404(Like, post=post, user=user)
+    #         self.perform_destroy(like)
+    #     except e:
+    #         pass
+
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class NewComment (generics.CreateAPIView):
-    permission_classes = [permissions.IsAuthenticated and IsAllowedToViewPost]
+    # permission_classes = [permissions.IsAuthenticated and IsAllowedToViewPost]
     serializer_class = CommentPostSerializer
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        post = get_object_or_404(Post, pk=request.data['post'])
+
+        content = request.data['content']
+
+        comment = Comment.objects.create(user=user, post=post, content=content)
+        return Response(CommentSerializer(instance=comment).data, status=status.HTTP_201_CREATED)
 
 
 class CommentsDelete (generics.DestroyAPIView):
