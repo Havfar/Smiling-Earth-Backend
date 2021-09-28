@@ -10,8 +10,31 @@ from teams.serializers import (JoinTeamSerializer, LeaveTeamSerializer,
                                TeamDetailSerializer, TeamSerializer)
 
 
+# Used to list all teams.
+# Currently not in use
 class TeamList(generics.ListCreateAPIView):
     queryset = Team.objects.filter(is_public=True)
+    serializer_class = TeamSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class NotJoinedTeamList(generics.ListAPIView):
+    def get_queryset(self):
+        memberships = Member.objects.filter(user=self.request.user)
+        teams = [membership.team.pk for membership in memberships]
+
+        return Team.objects.filter(~Q(id__in=teams), Q(is_public=True))
+
+    serializer_class = TeamSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class JoinedTeamList(generics.ListAPIView):
+    def get_queryset(self):
+        memberships = Member.objects.filter(user=self.request.user)
+        teams = [membership.team.pk for membership in memberships]
+        return Team.objects.filter(id__in=teams)
+
     serializer_class = TeamSerializer
     permission_classes = [permissions.IsAuthenticated]
 
