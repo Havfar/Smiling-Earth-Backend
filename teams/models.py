@@ -9,6 +9,7 @@ class Team(models.Model):
         User, on_delete=models.CASCADE, related_name='team_admin')
     location = models.CharField(max_length=8)
     is_public = models.BooleanField(default=True)
+    symbol = models.CharField(max_length=20)
 
     def get_members_count(self):
         return Member.objects.filter(team=self.pk).count()
