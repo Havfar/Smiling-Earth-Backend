@@ -14,7 +14,7 @@ class TeamSerializer(serializers.ModelSerializer):
 class TeamDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ['id', 'name', 'description', 'admin', 'location']
+        fields = ['id', 'name', 'symbol', 'description', 'location']
 
 
 class MemberSerializer(serializers.ModelSerializer):
@@ -56,3 +56,9 @@ class RivalSerializer(serializers.ModelSerializer):
             'receiver',
             'status'
         ]
+
+
+class TeamEmissionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        mode = Member
