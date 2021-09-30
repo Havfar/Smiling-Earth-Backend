@@ -30,4 +30,5 @@ urlpatterns = [
     path('', include('users.urls')),
     path('', include('teams.urls')),
     path('', include('pledge.urls')),
+    path('', include('emissions.urls')),
 ]

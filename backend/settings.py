@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'challenges',
     'activities',
     'pledge',
+    'emissions'
 ]
 
 MIDDLEWARE = [
