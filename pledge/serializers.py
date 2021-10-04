@@ -5,6 +5,7 @@ from pledge.models import Pledge, TeamPledge, UserPledge
 
 
 class PledgeSerializer(ModelSerializer):
+    # icon_utf =
     class Meta:
         model = Pledge
         fields = ['id', 'title', 'description', 'color', 'icon']

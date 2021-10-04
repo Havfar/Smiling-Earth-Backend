@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
+from teams.models import Team
 from users.models import Profile
 from users.serializers import ProfileSerializer
 
@@ -17,6 +18,8 @@ class Post(models.Model):
     activity = models.ForeignKey(
         Activity, default=None, null=True, on_delete=models.CASCADE, related_name="posts"
     )
+    team = models.ForeignKey(
+        Team, default=None, null=True, on_delete=models.CASCADE, related_name='posts')
 
     def get_likes_count(self):
         return Like.objects.filter(post=self).count()
