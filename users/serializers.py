@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ['id', 'first_name', 'last_name', 'user']
+        fields = ['user_id', 'first_name', 'last_name']
 
 
 class ProfileDetailedSerializer(serializers.ModelSerializer):
@@ -22,7 +22,8 @@ class ProfileDetailedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ['id', 'first_name', 'last_name', 'followers_count', 'email']
+        fields = ['user_id', 'first_name',
+                  'last_name', 'followers_count', 'email']
 
 
 class FollowerSerializer(serializers.ModelSerializer):

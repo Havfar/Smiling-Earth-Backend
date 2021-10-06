@@ -6,8 +6,9 @@ from users.permissions import IsOwner
 from teams.models import Member, Rival, Team
 from teams.permissions import IsTeamAdmin
 from teams.serializers import (JoinTeamSerializer, LeaveTeamSerializer,
-                               MemberSerializer, RivalSerializer,
-                               TeamDetailSerializer, TeamSerializer)
+                               MemberEmissionsSerializer, MemberSerializer,
+                               RivalSerializer, TeamDetailSerializer,
+                               TeamSerializer)
 
 
 # Used to list all teams.
@@ -45,8 +46,17 @@ class TeamDetail(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsTeamAdmin]
 
 
+class TeamEmissions(generics.ListAPIView):
+    serializer_class = MemberEmissionsSerializer
+    permission_classes = [permissions.IsAuthenticated, IsTeamAdmin]
+
+    def get_queryset(self):
+        team = get_object_or_404(Team, pk=self.kwargs["pk"])
+        return Member.objects.filter(team=team)
+
+
 class MembersOfTeam(generics.ListCreateAPIView):
-    serializer_class = MemberSerializer
+    serializer_class = MemberEmissionsSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -88,3 +98,11 @@ class RivalRequests(generics.RetrieveUpdateAPIView):
     def get_queryset(self):
         team = get_object_or_404(Team, pk=self.kwargs["pk"])
         return Rival.objects.filter(Q(receiver=team), Q(status='p'))
+
+
+# class GetRivalsEmission(generics.ListAPIView):
+#     serializer_class = RivalEmissionSerializer
+
+#     def get_queryset(self):
+#         team = get_object_or_404(Team, pk=self.kwargs["pk"])
+#         return Rival.objects.filter(Q(receiver=team), Q(status='p'))
