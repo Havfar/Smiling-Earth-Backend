@@ -22,19 +22,16 @@ class TeamDetailSerializer(serializers.ModelSerializer):
 
 
 class MemberSerializer(serializers.ModelSerializer):
-    user = serializers.DictField(
-        child=serializers.CharField(), source='get_user_info', read_only=True)
+    # user = serializers.DictField(
+    # child=serializers.CharField(), source='get_user_info', read_only=True)
 
     class Meta:
         model = Member
-        fields = ['id', 'user']
-        read_only_fields = ['id', 'user']
+        fields = ['id', 'user', 'team']
 
 
 class MemberEmissionsSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='get_user_profile')
-    # emissions = serializers.DateField(
-    #     child=serializers.CharField(), source='get_user_emission', read_only=True)
     emissions = serializers.ReadOnlyField(
         source="get_user_emissions", read_only=True)
 
@@ -50,7 +47,6 @@ class MemberEmissionsSerializer(serializers.ModelSerializer):
 class JoinTeamSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
-        user = data['user']
         team = data['team']
         already_member = Member.objects.filter(user=user, team=team).first()
         if already_member:
@@ -82,7 +78,6 @@ class RivalSerializer(serializers.ModelSerializer):
             'status',
             'team'
         ]
-
 
 
 # class RivalEmissionSerializer(serializers.ModelSerializer):

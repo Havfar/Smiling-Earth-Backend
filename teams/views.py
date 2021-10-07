@@ -1,6 +1,7 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, mixins, permissions
+from rest_framework import generics, mixins, permissions, status
+from rest_framework.response import Response
 from users.permissions import IsOwner
 
 from teams.models import Member, Rival, Team
@@ -64,12 +65,17 @@ class MembersOfTeam(generics.ListCreateAPIView):
         return Member.objects.filter(team=team)
 
 
-class Join(mixins.CreateModelMixin, generics.GenericAPIView):
+class Join(generics.CreateAPIView):
     serializer_class = JoinTeamSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        team = get_object_or_404(Team, pk=request.data['team'])
+
+        member, created = Member.objects.get_or_create(user=user, team=team)
+
+        return Response(MemberSerializer(instance=member).data, status=status.HTTP_201_CREATED)
 
 
 class Leave(mixins.DestroyModelMixin, generics.GenericAPIView):
