@@ -1,9 +1,13 @@
-from rest_framework.response import Response
-from rest_framework import generics, permissions, status
+from django.db.models.query_utils import Q
 from django.shortcuts import get_object_or_404
-from challenges.models import Challenge, ChallengeUser
-from challenges.serializers import ChallengeSerializer, ChallengeUserSerializer
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
 from users.permissions import IsOwner
+
+from challenges.models import Challenge, ChallengeUser
+from challenges.serializers import (ChallengeDetailedSerializer,
+                                    ChallengeSerializer,
+                                    ChallengeUserSerializer)
 
 
 class ChallengeList(generics.ListCreateAPIView):
@@ -11,10 +15,27 @@ class ChallengeList(generics.ListCreateAPIView):
     serializer_class = ChallengeSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
+        joined_challenges_qs = ChallengeUser.objects.filter(user=user)
+        joined_challenges = [
+            challenge.challenge.pk for challenge in joined_challenges_qs]
+        challenges = Challenge.objects.filter(~Q(id__in=joined_challenges))
+        return challenges
+
+
+class ChallengeUserList(generics.ListCreateAPIView):
+    serializer_class = ChallengeUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return ChallengeUser.objects.filter(user=user)
+
 
 class ChallengeDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Challenge.objects.all()
-    serializer_class = ChallengeSerializer
+    serializer_class = ChallengeDetailedSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
