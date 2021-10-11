@@ -19,6 +19,8 @@ class ChallengeDetailedSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ChallengeUserSerializer(serializers.ModelSerializer):
+    challenge = ChallengeSerializer(read_only=True)
+
     class Meta:
         model = ChallengeUser
-        fields = ['id', 'score', 'progress']
+        fields = ['id', 'score', 'progress', 'challenge']
