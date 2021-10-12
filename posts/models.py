@@ -1,5 +1,7 @@
+import challenges
 from activities.models import Activity
 from activities.serializers import ActivitySerializer, ActivitySerializerGet
+from challenges.models import Challenge
 from django.contrib.auth import get_user_model
 from django.db import models
 from rest_framework import serializers
@@ -17,6 +19,9 @@ class Post(models.Model):
     content = models.CharField(max_length=300)
     activity = models.ForeignKey(
         Activity, default=None, null=True, on_delete=models.CASCADE, related_name="posts"
+    )
+    challenge = models.ForeignKey(
+        Challenge, default=None, null=True, on_delete=models.CASCADE, related_name="posts"
     )
     team = models.ForeignKey(
         Team, default=None, null=True, on_delete=models.CASCADE, related_name='posts')
@@ -49,7 +54,7 @@ class Post(models.Model):
         return None
 
     class Meta:
-        ordering = ['timestamp']
+        ordering = ['-timestamp']
 
 
 class Like(models.Model):

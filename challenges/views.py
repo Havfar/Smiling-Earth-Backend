@@ -1,5 +1,6 @@
 from django.db.models.query_utils import Q
 from django.shortcuts import get_object_or_404
+from posts.models import Post
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from users.permissions import IsOwner
@@ -47,6 +48,10 @@ class ChallengeUserPost(generics.CreateAPIView):
         challenge = get_object_or_404(Challenge, id=request.data['challenge'])
         challenge_user, created = ChallengeUser.objects.get_or_create(
             user=request.user, challenge=challenge, score=0, progress=0)
+
+        if created:
+            Post.objects.create(
+                user=request.user, content="Joined the challenge", challenge=challenge)
         return Response({"challenge user": {"id": challenge_user.id}}, status=status.HTTP_201_CREATED)
 
 

@@ -1,3 +1,4 @@
+from challenges.serializers import ChallengeSerializer
 from django.apps import apps
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
@@ -11,12 +12,13 @@ class PostSerializer(ModelSerializer):
     likes_count = serializers.ReadOnlyField(source="get_likes_count")
     comments_count = serializers.ReadOnlyField(source="get_comments_count")
     activity = serializers.ReadOnlyField(source="get_activity", required=False)
+    challenge = ChallengeSerializer(read_only=True)
 
     class Meta:
         depth = 1
         model = Post
         fields = ["id", "user", "content", "timestamp",
-                  "likes_count", "comments_count", "activity"]
+                  "likes_count", "comments_count", "activity", "challenge"]
 
 
 class PostDetailedSerializer(ModelSerializer):
