@@ -47,18 +47,15 @@ class Follower(models.Model):
     is_followed_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='is_followed_by')
 
-    def get_user_info(self):
-        user_dict = vars(self.user)
-        return {"id": user_dict["id"], "email": user_dict["email"]}
-
     def get_profile(self):
         profile = Profile.objects.get(user=self.user)
         serializer = _ProfileSerializer(instance=profile)
         return serializer.data
 
-    def get_is_followed_by_info(self):
-        user_dict = vars(self.is_followed_by)
-        return {"id": user_dict["id"], "email": user_dict["email"]}
+    def get_followed_by_profile(self):
+        profile = Profile.objects.get(user=self.is_followed_by)
+        serializer = _ProfileSerializer(instance=profile)
+        return serializer.data
 
     def get_following(self, user):
         return Follower.objects.filter(is_followed_by=user)
@@ -71,6 +68,12 @@ class Follower(models.Model):
 
     def get_followers_count(self, user):
         return Follower.objects.filter(user=user).count()
+
+    def is_following(self):
+        following = Follower.objects.filter(
+            user=self.is_followed_by, is_followed_by=self.user)
+        return following.count() > 0
+        # return False
 
     def __str__(self):
         return str(self)

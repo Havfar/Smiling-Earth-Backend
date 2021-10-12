@@ -30,9 +30,21 @@ class ProfileDetailedSerializer(serializers.ModelSerializer):
 class FollowerSerializer(serializers.ModelSerializer):
     # user = serializers.DictField(
     #     child=serializers.CharField(), source='get_profile', read_only=True)
+    # user = ReadOnlyField(source='get_profile')
+    # is_following = ReadOnlyField(source='is_following')
+    followed_by = ReadOnlyField(source='get_followed_by_profile')
+
+    class Meta:
+        model = Follower
+        fields = ['followed_by', 'is_following']
+
+
+class FollowingSerializer(serializers.ModelSerializer):
+    # user = serializers.DictField(
+    #     child=serializers.CharField(), source='get_profile', read_only=True)
     user = ReadOnlyField(source='get_profile')
+    # is_following = ReadOnlyField(source='is_following')
 
     class Meta:
         model = Follower
         fields = ['user']
-        read_only_fields = ['user']
