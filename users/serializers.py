@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.fields import ReadOnlyField
 
 from users.models import Follower, Profile
 
@@ -27,8 +28,9 @@ class ProfileDetailedSerializer(serializers.ModelSerializer):
 
 
 class FollowerSerializer(serializers.ModelSerializer):
-    user = serializers.DictField(
-        child=serializers.CharField(), source='get_user_info', read_only=True)
+    # user = serializers.DictField(
+    #     child=serializers.CharField(), source='get_profile', read_only=True)
+    user = ReadOnlyField(source='get_profile')
 
     class Meta:
         model = Follower

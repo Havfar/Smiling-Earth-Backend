@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
 from .managers import CustomUserManager
 
@@ -50,6 +51,11 @@ class Follower(models.Model):
         user_dict = vars(self.user)
         return {"id": user_dict["id"], "email": user_dict["email"]}
 
+    def get_profile(self):
+        profile = Profile.objects.get(user=self.user)
+        serializer = _ProfileSerializer(instance=profile)
+        return serializer.data
+
     def get_is_followed_by_info(self):
         user_dict = vars(self.is_followed_by)
         return {"id": user_dict["id"], "email": user_dict["email"]}
@@ -68,3 +74,10 @@ class Follower(models.Model):
 
     def __str__(self):
         return str(self)
+
+
+# Private serializer to prevent circular import error
+class _ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['user_id', 'first_name', 'last_name']

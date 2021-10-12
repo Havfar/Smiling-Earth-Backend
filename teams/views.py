@@ -24,7 +24,6 @@ class NotJoinedTeamList(generics.ListAPIView):
     def get_queryset(self):
         memberships = Member.objects.filter(user=self.request.user)
         teams = [membership.team.pk for membership in memberships]
-
         return Team.objects.filter(~Q(id__in=teams), Q(is_public=True))
 
     serializer_class = TeamSerializer
