@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from posts.models import Post
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from users.models import User
 from users.permissions import IsOwner
 
 from challenges.models import Challenge, ChallengeUser
@@ -32,6 +33,24 @@ class ChallengeUserList(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         return ChallengeUser.objects.filter(user=user)
+
+
+class CompletedChallengeList(generics.ListCreateAPIView):
+    serializer_class = ChallengeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = get_object_or_404(User, pk=self.kwargs['pk'])
+        user_challenges_qs = ChallengeUser.objects.filter(Q(user=user))
+        user_challenges = [
+            challenge for challenge in user_challenges_qs]
+
+        challenges = []
+        for challenge in user_challenges:
+            if(challenge.progress == challenge.challenge.goal):
+                challenges.append(challenge.challenge.id)
+
+        return Challenge.objects.filter(Q(id__in=challenges))
 
 
 class ChallengeDetail(generics.RetrieveUpdateDestroyAPIView):

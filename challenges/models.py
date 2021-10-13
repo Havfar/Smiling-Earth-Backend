@@ -11,6 +11,7 @@ class Challenge(models.Model):
     end_date = models.DateTimeField()
     symbol = models.CharField(max_length=12)
     background_color = models.CharField(max_length=12)
+    goal = models.IntegerField(default=0)
 
     def get_leaderboard(self):
         users_qs = ChallengeUser.objects.filter(

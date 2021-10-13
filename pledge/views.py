@@ -19,7 +19,7 @@ class PledgeList(generics.ListAPIView):
 
 class PledgeUserList(generics.ListAPIView):
     serializer_class = UserPledgeSerializer
-    permission_classes = [permissions.IsAuthenticated and IsFollowingOrOwner]
+    # permission_classes = [permissions.IsAuthenticated and IsFollowingOrOwner]
 
     def get_queryset(self):
         user = get_object_or_404(get_user_model(), pk=self.kwargs['pk'])

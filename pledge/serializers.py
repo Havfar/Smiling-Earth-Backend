@@ -11,9 +11,11 @@ class PledgeSerializer(ModelSerializer):
 
 
 class UserPledgeSerializer(ModelSerializer):
+    pledge = PledgeSerializer(read_only=True)
+
     class Meta:
         model = UserPledge
-        fields = ['id', 'pledge', 'user']
+        fields = ['pledge']
 
 
 class TeamPledgeSerializer(ModelSerializer):
