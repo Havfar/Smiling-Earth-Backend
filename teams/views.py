@@ -2,6 +2,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, mixins, permissions, status
 from rest_framework.response import Response
+from users.models import User
 from users.permissions import IsOwner
 
 from teams.models import Member, Rival, Team
@@ -9,7 +10,7 @@ from teams.permissions import IsTeamAdmin
 from teams.serializers import (JoinTeamSerializer, LeaveTeamSerializer,
                                MemberEmissionsSerializer, MemberSerializer,
                                RivalSerializer, TeamDetailSerializer,
-                               TeamSerializer)
+                               TeamSerializer, UserTeamSerializer)
 
 
 # Used to list all teams.
@@ -57,11 +58,22 @@ class TeamEmissions(generics.ListAPIView):
 
 class MembersOfTeam(generics.ListCreateAPIView):
     serializer_class = MemberEmissionsSerializer
+
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         team = get_object_or_404(Team, pk=self.kwargs["pk"])
         return Member.objects.filter(team=team)
+
+
+class UserTeamList(generics.ListAPIView):
+    serializer_class = UserTeamSerializer
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = get_object_or_404(User, pk=self.kwargs["pk"])
+        return Member.objects.filter(user=user)
 
 
 class Join(generics.CreateAPIView):

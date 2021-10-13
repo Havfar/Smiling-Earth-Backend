@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from teams.models import Team
-from users.models import Follower
+from users.models import Follower, User
 
 from posts.models import Comment, Like, Post
 from posts.permissions import IsAllowedToViewPost, IsOwner
@@ -35,6 +35,15 @@ class TeamPostList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class UserPostList(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        user = get_object_or_404(User, pk=self.kwargs['pk'])
+        return Post.objects.filter(Q(user=user))
 
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):

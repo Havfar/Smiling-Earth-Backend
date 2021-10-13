@@ -30,6 +30,14 @@ class MemberSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'team']
 
 
+class UserTeamSerializer(serializers.ModelSerializer):
+    team = TeamSerializer(read_only=True)
+
+    class Meta:
+        model = Member
+        fields = ['team']
+
+
 class MemberEmissionsSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='get_user_profile')
     emissions = serializers.ReadOnlyField(

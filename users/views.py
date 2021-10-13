@@ -19,7 +19,7 @@ class UserList(generics.ListAPIView):
 class UserDetail(generics.RetrieveAPIView):
     serializer_class = ProfileDetailedSerializer
     queryset = Profile.objects.all()
-    permission_classes = [permissions.IsAuthenticated and IsFollowingOrOwner]
+    # permission_classes = [permissions.IsAuthenticated and IsFollowingOrOwner]
 
 
 class Following(generics.ListAPIView):
