@@ -7,6 +7,7 @@ from rest_framework import generics, permissions
 from users.models import Follower, Profile, User
 from users.permissions import IsFollowingOrOwner, IsOwner
 from users.serializers import (FollowerSerializer, FollowingSerializer,
+                               MyProfileDetailedSerializer,
                                ProfileDetailedSerializer, ProfileSerializer)
 
 
@@ -14,6 +15,14 @@ class UserList(generics.ListAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class UserSelfDetail(generics.ListAPIView):
+    serializer_class = MyProfileDetailedSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Profile.objects.filter(user=user.pk)
 
 
 class UserDetail(generics.RetrieveAPIView):

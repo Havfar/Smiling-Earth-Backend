@@ -25,6 +25,14 @@ class PledgeUserList(generics.ListAPIView):
         user = get_object_or_404(get_user_model(), pk=self.kwargs['pk'])
         return UserPledge.objects.filter(user=user)
 
+class MyPledgeUserList(generics.ListAPIView):
+    serializer_class = UserPledgeSerializer
+    # permission_classes = [permissions.IsAuthenticated and IsFollowingOrOwner]
+
+    def get_queryset(self):
+        user = self.request.user
+        return UserPledge.objects.filter(user=user)
+
 
 class PledgeTeamList(generics.ListAPIView):
     serializer_class = TeamPledgeSerializer

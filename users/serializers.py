@@ -17,14 +17,22 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ['user_id', 'first_name', 'last_name']
 
 
-class ProfileDetailedSerializer(serializers.ModelSerializer):
-    followers_count = serializers.IntegerField(source='get_followers_count')
-    email = serializers.CharField(source='get_email')
+class MyProfileDetailedSerializer(serializers.ModelSerializer):
+    followers_count = ReadOnlyField(source='get_followers_count')
+    following_count = ReadOnlyField(source='get_following_count')
 
     class Meta:
         model = Profile
-        fields = ['user_id', 'first_name',
-                  'last_name', 'followers_count', 'email']
+        fields = ['user_id', 'first_name', 'bio',
+                  'last_name', 'followers_count', 'following_count']
+
+
+class ProfileDetailedSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Profile
+        fields = ['user_id', 'first_name', 'bio',
+                  'last_name']
 
 
 class FollowerSerializer(serializers.ModelSerializer):

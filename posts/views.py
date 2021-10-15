@@ -46,6 +46,15 @@ class UserPostList(generics.ListAPIView):
         return Post.objects.filter(Q(user=user))
 
 
+class MyPostList(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Post.objects.filter(Q(user=user))
+
+
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     # permission_classes = [IsOwner]
     queryset = Post.objects.all()

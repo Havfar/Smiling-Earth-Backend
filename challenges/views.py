@@ -53,6 +53,24 @@ class CompletedChallengeList(generics.ListCreateAPIView):
         return Challenge.objects.filter(Q(id__in=challenges))
 
 
+class MyCompletedChallengeList(generics.ListCreateAPIView):
+    serializer_class = ChallengeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        user_challenges_qs = ChallengeUser.objects.filter(Q(user=user))
+        user_challenges = [
+            challenge for challenge in user_challenges_qs]
+
+        challenges = []
+        for challenge in user_challenges:
+            if(challenge.progress == challenge.challenge.goal):
+                challenges.append(challenge.challenge.id)
+
+        return Challenge.objects.filter(Q(id__in=challenges))
+
+
 class ChallengeDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Challenge.objects.all()
     serializer_class = ChallengeDetailedSerializer
