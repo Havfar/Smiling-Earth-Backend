@@ -3,7 +3,8 @@ from django.http import request
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from users.models import Follower
+from teams.models import Team
+from users.models import Follower, User
 
 from posts.models import Comment, Like, Post
 from posts.permissions import IsAllowedToViewPost, IsOwner
@@ -22,6 +23,36 @@ class PostList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class TeamPostList(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        team = get_object_or_404(Team, pk=self.kwargs['pk'])
+        return Post.objects.filter(Q(team=team))
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class UserPostList(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        user = get_object_or_404(User, pk=self.kwargs['pk'])
+        return Post.objects.filter(Q(user=user))
+
+
+class MyPostList(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Post.objects.filter(Q(user=user))
 
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -124,6 +155,9 @@ class CommentList(generics.ListAPIView):
 def get_posts_queryset(user):
     follower = Follower.objects.filter(user=user)
     followers = (user for user in follower)
+    followers_qs = [user.pk for user in followers]
+    followers_qs.append(user.pk)
+    # Todo: legg inn user i queryset
     queryset = Post.objects.filter(
-        user__pk__in=[user.pk for user in followers])
+        user__pk__in=followers_qs)
     return queryset

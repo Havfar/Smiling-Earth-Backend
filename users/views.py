@@ -1,12 +1,14 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models.query_utils import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from rest_framework import generics, permissions
 
 from users.models import Follower, Profile, User
 from users.permissions import IsFollowingOrOwner, IsOwner
-from users.serializers import (FollowerSerializer, ProfileDetailedSerializer,
-                               ProfileSerializer)
+from users.serializers import (FollowerSerializer, FollowingSerializer,
+                               MyProfileDetailedSerializer,
+                               ProfileDetailedSerializer, ProfileSerializer)
 
 
 class UserList(generics.ListAPIView):
@@ -15,29 +17,48 @@ class UserList(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 
+class UserSelfDetail(generics.ListAPIView):
+    serializer_class = MyProfileDetailedSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Profile.objects.filter(user=user.pk)
+
+
 class UserDetail(generics.RetrieveAPIView):
     serializer_class = ProfileDetailedSerializer
     queryset = Profile.objects.all()
-    permission_classes = [permissions.IsAuthenticated and IsFollowingOrOwner]
+    # permission_classes = [permissions.IsAuthenticated and IsFollowingOrOwner]
 
 
 class Following(generics.ListAPIView):
-    serializer_class = FollowerSerializer
-    permission_classes = [permissions.IsAuthenticated and IsOwner]
+    serializer_class = FollowingSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        user = get_object_or_404(User, pk=self.kwargs["pk"])
-        return Follower.objects.filter(is_followed_by=user)
+        # user = get_object_or_404(Follower, pk=self.kwargs["pk"])
+        return Follower.objects.filter(is_followed_by=self.request.user)
 
 
 class Followers(generics.ListAPIView):
-    queryset = Follower.objects.all()
     serializer_class = FollowerSerializer
-    permission_classes = [permissions.IsAuthenticated and IsOwner]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        user = get_object_or_404(User, pk=self.kwargs["pk"])
-        return Follower.objects.filter(user=user).exclude(is_followed_by=user)
+        # user = get_object_or_404(User, pk=self.kwargs["pk"])
+        # return Follower.objects.filter(user=self.request.user).exclude(is_followed_by=self.request.user)
+        return Follower.objects.filter(Q(user=self.request.user))
+
+
+class NotFollowingList(generics.ListAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        followers = Follower.objects.filter(is_followed_by=self.request.user)
+        users = [user.pk for user in followers]
+
+        return Profile.objects.filter(~Q(user_id__in=users))
 
 
 @login_required

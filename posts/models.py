@@ -1,7 +1,12 @@
+import challenges
+from activities.models import Activity
+from activities.serializers import ActivitySerializer, ActivitySerializerGet
+from challenges.models import Challenge
 from django.contrib.auth import get_user_model
 from django.db import models
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
+from teams.models import Team
 from users.models import Profile
 from users.serializers import ProfileSerializer
 
@@ -12,14 +17,21 @@ class Post(models.Model):
         get_user_model(), on_delete=models.CASCADE, related_name="posts"
     )
     content = models.CharField(max_length=300)
+    activity = models.ForeignKey(
+        Activity, default=None, null=True, on_delete=models.CASCADE, related_name="posts"
+    )
+    challenge = models.ForeignKey(
+        Challenge, default=None, null=True, on_delete=models.CASCADE, related_name="posts"
+    )
+    team = models.ForeignKey(
+        Team, default=None, null=True, on_delete=models.CASCADE, related_name='posts')
 
     def get_likes_count(self):
         return Like.objects.filter(post=self).count()
 
     def get_likes(self):
         likes = Like.objects.filter(post=self)
-        print(likes)
-        serializer = _LikesSerializer(instance=likes)
+        serializer = _LikesSerializer(instance=likes, many=True)
         return serializer.data
 
     def get_comments_count(self):
@@ -35,8 +47,14 @@ class Post(models.Model):
         serializer = ProfileSerializer(instance=user)
         return serializer.data
 
+    def get_activity(self):
+        if self.activity != None:
+            serializer = ActivitySerializerGet(instance=self.activity)
+            return serializer.data
+        return None
+
     class Meta:
-        ordering = ['timestamp']
+        ordering = ['-timestamp']
 
 
 class Like(models.Model):

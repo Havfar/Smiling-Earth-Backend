@@ -1,17 +1,42 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, mixins, permissions
+from rest_framework import generics, mixins, permissions, status
+from rest_framework.response import Response
+from users.models import User
 from users.permissions import IsOwner
 
 from teams.models import Member, Rival, Team
 from teams.permissions import IsTeamAdmin
 from teams.serializers import (JoinTeamSerializer, LeaveTeamSerializer,
-                               MemberSerializer, RivalSerializer,
-                               TeamDetailSerializer, TeamSerializer)
+                               MemberEmissionsSerializer, MemberSerializer,
+                               RivalSerializer, TeamDetailSerializer,
+                               TeamSerializer, UserTeamSerializer)
 
 
+# Used to list all teams.
+# Currently not in use
 class TeamList(generics.ListCreateAPIView):
     queryset = Team.objects.filter(is_public=True)
+    serializer_class = TeamSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class NotJoinedTeamList(generics.ListAPIView):
+    def get_queryset(self):
+        memberships = Member.objects.filter(user=self.request.user)
+        teams = [membership.team.pk for membership in memberships]
+        return Team.objects.filter(~Q(id__in=teams), Q(is_public=True))
+
+    serializer_class = TeamSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class JoinedTeamList(generics.ListAPIView):
+    def get_queryset(self):
+        memberships = Member.objects.filter(user=self.request.user)
+        teams = [membership.team.pk for membership in memberships]
+        return Team.objects.filter(id__in=teams)
+
     serializer_class = TeamSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -22,8 +47,18 @@ class TeamDetail(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsTeamAdmin]
 
 
+class TeamEmissions(generics.ListAPIView):
+    serializer_class = MemberEmissionsSerializer
+    permission_classes = [permissions.IsAuthenticated, IsTeamAdmin]
+
+    def get_queryset(self):
+        team = get_object_or_404(Team, pk=self.kwargs["pk"])
+        return Member.objects.filter(team=team)
+
+
 class MembersOfTeam(generics.ListCreateAPIView):
-    serializer_class = MemberSerializer
+    serializer_class = MemberEmissionsSerializer
+
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -31,12 +66,27 @@ class MembersOfTeam(generics.ListCreateAPIView):
         return Member.objects.filter(team=team)
 
 
-class Join(mixins.CreateModelMixin, generics.GenericAPIView):
+class UserTeamList(generics.ListAPIView):
+    serializer_class = UserTeamSerializer
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = get_object_or_404(User, pk=self.kwargs["pk"])
+        return Member.objects.filter(user=user)
+
+
+class Join(generics.CreateAPIView):
     serializer_class = JoinTeamSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        team = get_object_or_404(Team, pk=request.data['team'])
+
+        member, created = Member.objects.get_or_create(user=user, team=team)
+
+        return Response(MemberSerializer(instance=member).data, status=status.HTTP_201_CREATED)
 
 
 class Leave(mixins.DestroyModelMixin, generics.GenericAPIView):
@@ -65,3 +115,11 @@ class RivalRequests(generics.RetrieveUpdateAPIView):
     def get_queryset(self):
         team = get_object_or_404(Team, pk=self.kwargs["pk"])
         return Rival.objects.filter(Q(receiver=team), Q(status='p'))
+
+
+# class GetRivalsEmission(generics.ListAPIView):
+#     serializer_class = RivalEmissionSerializer
+
+#     def get_queryset(self):
+#         team = get_object_or_404(Team, pk=self.kwargs["pk"])
+#         return Rival.objects.filter(Q(receiver=team), Q(status='p'))

@@ -1,5 +1,7 @@
+from activities import serializers
 from rest_framework.serializers import ModelSerializer
-from pledge.models import Pledge, UserPledge
+
+from pledge.models import Pledge, TeamPledge, UserPledge
 
 
 class PledgeSerializer(ModelSerializer):
@@ -9,6 +11,16 @@ class PledgeSerializer(ModelSerializer):
 
 
 class UserPledgeSerializer(ModelSerializer):
+    pledge = PledgeSerializer(read_only=True)
+
     class Meta:
         model = UserPledge
-        fields = ['id', 'pledge', 'user']
+        fields = ['pledge']
+
+
+class TeamPledgeSerializer(ModelSerializer):
+    pledge = PledgeSerializer(read_only=True)
+
+    class Meta:
+        model = TeamPledge
+        fields = ['id', 'pledge', 'team']
