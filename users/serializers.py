@@ -12,9 +12,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    avatar = ReadOnlyField(source='get_avatar')
+
     class Meta:
         model = Profile
-        fields = ['user_id', 'first_name', 'last_name']
+        fields = ['user_id', 'first_name', 'last_name', 'avatar']
 
 
 class MyProfileDetailedSerializer(serializers.ModelSerializer):

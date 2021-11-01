@@ -25,6 +25,7 @@ class PledgeUserList(generics.ListAPIView):
         user = get_object_or_404(get_user_model(), pk=self.kwargs['pk'])
         return UserPledge.objects.filter(user=user)
 
+
 class MyPledgeUserList(generics.ListAPIView):
     serializer_class = UserPledgeSerializer
     # permission_classes = [permissions.IsAuthenticated and IsFollowingOrOwner]
@@ -48,9 +49,18 @@ class CreatePledgeUser(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        user_pledge, created = UserPledge.objects.get_or_create(
-            user=request.user, pledge=request.data['pledge'])
-        return Response(status=status.HTTP_201_CREATED, data={'user_pledge': {"id": user_pledge.id, 'pledge': user_pledge.pledge.id}})
+        pledges = []
+        body = request.data['pledges']
+        user_pledges = [i.strip()
+                        for i in body[1:-1].replace('"', "").split(',')]
+
+        for user_pledge in user_pledges:
+            pledge = get_object_or_404(Pledge, pk=user_pledge)
+            pledges.append(UserPledge(user=request.user, pledge=pledge))
+        UserPledge.objects.bulk_create(pledges)
+        # user_pledge, created = UserPledge.objects.get_or_create(
+        #     user=request.user, pledge=request.data['pledge'])
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class PledgeUserDelete(generics.DestroyAPIView):
