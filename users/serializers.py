@@ -19,6 +19,14 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ['user_id', 'first_name', 'last_name', 'avatar']
 
 
+class AvatarSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Profile
+        fields = ['topType', 'accessoriesType', 'hairColor', 'facialHairType', 'facialHairColor', 'clotheType', 'eyeType',
+                  'eyebrowType', 'mouthType', 'skinColor', 'clotheColor', 'style', 'graphicType']
+
+
 class MyProfileDetailedSerializer(serializers.ModelSerializer):
     followers_count = ReadOnlyField(source='get_followers_count')
     following_count = ReadOnlyField(source='get_following_count')

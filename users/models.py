@@ -32,19 +32,19 @@ class Profile(models.Model):
     bio = models.CharField(max_length=300)
 
     # fluttermoji
-    top_type = models.IntegerField(default=0)
-    accessories_type = models.IntegerField(default=0)
-    hair_color = models.IntegerField(default=0)
-    facial_hair_type = models.IntegerField(default=0)
-    facial_hair_color = models.IntegerField(default=0)
-    clothe_type = models.IntegerField(default=0)
-    eye_type = models.IntegerField(default=0)
-    eyebrow_type = models.IntegerField(default=0)
-    mouth_type = models.IntegerField(default=0)
-    skin_color = models.IntegerField(default=0)
-    clothe_color = models.IntegerField(default=0)
+    topType = models.IntegerField(default=0)
+    accessoriesType = models.IntegerField(default=0)
+    hairColor = models.IntegerField(default=0)
+    facialHairType = models.IntegerField(default=0)
+    facialHairColor = models.IntegerField(default=0)
+    clotheType = models.IntegerField(default=0)
+    eyeType = models.IntegerField(default=0)
+    eyebrowType = models.IntegerField(default=0)
+    mouthType = models.IntegerField(default=0)
+    skinColor = models.IntegerField(default=0)
+    clotheColor = models.IntegerField(default=0)
     style = models.IntegerField(default=0)
-    graphic_type = models.IntegerField(default=0)
+    graphicType = models.IntegerField(default=0)
 
     def get_followers_count(self):
         return Follower.objects.filter(user=self.user).exclude(is_followed_by=self.user).count()
@@ -57,19 +57,19 @@ class Profile(models.Model):
 
     def get_avatar(self):
         return {
-            "topType": self.top_type,
-            "accessoriesType": self.accessories_type,
-            "hairColor": self.hair_color,
-            "facialHairType": self.facial_hair_type,
-            "facialHairColor": self.facial_hair_color,
-            "clotheType": self.clothe_type,
-            "eyeType": self.eye_type,
-            "eyebrowType": self.eyebrow_type,
-            "mouthType": self.mouth_type,
-            "skinColor": self.top_type,
-            "clotheColor": self.clothe_color,
+            "topType": self.topType,
+            "accessoriesType": self.accessoriesType,
+            "hairColor": self.hairColor,
+            "facialHairType": self.facialHairType,
+            "facialHairColor": self.facialHairColor,
+            "clotheType": self.clotheType,
+            "eyeType": self.eyeType,
+            "eyebrowType": self.eyebrowType,
+            "mouthType": self.mouthType,
+            "skinColor": self.skinColor,
+            "clotheColor": self.clotheColor,
             "style": self.style,
-            "graphicType": self.graphic_type
+            "graphicType": self.graphicType
         }
 
 
