@@ -2,11 +2,12 @@ from django.contrib.auth.decorators import login_required
 from django.db.models.query_utils import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, response, status
 
 from users.models import Follower, Profile, User
 from users.permissions import IsFollowingOrOwner, IsOwner
-from users.serializers import (FollowerSerializer, FollowingSerializer,
+from users.serializers import (AvatarSerializer, FollowerSerializer,
+                               FollowingSerializer,
                                MyProfileDetailedSerializer,
                                ProfileDetailedSerializer, ProfileSerializer)
 
@@ -38,6 +39,31 @@ class Following(generics.ListAPIView):
     def get_queryset(self):
         # user = get_object_or_404(Follower, pk=self.kwargs["pk"])
         return Follower.objects.filter(is_followed_by=self.request.user)
+
+
+class UpdateAvatar(generics.UpdateAPIView):
+    serializer_class = AvatarSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Profile.objects.all()
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        # make sure to catch 404's below
+        obj = queryset.get(pk=self.request.user.pk)
+        # self.check_object_permissions(self.request, obj)
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return response.Response(status=status.HTTP_200_OK, data={"message": "avatar updated successfully"})
+
+        else:
+            return response.Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"message": "failed", "details": serializer.errors})
 
 
 class Followers(generics.ListAPIView):

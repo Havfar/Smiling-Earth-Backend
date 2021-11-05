@@ -31,6 +31,21 @@ class Profile(models.Model):
     last_name = models.CharField(max_length=150)
     bio = models.CharField(max_length=300)
 
+    # fluttermoji
+    topType = models.IntegerField(default=0)
+    accessoriesType = models.IntegerField(default=0)
+    hairColor = models.IntegerField(default=0)
+    facialHairType = models.IntegerField(default=0)
+    facialHairColor = models.IntegerField(default=0)
+    clotheType = models.IntegerField(default=0)
+    eyeType = models.IntegerField(default=0)
+    eyebrowType = models.IntegerField(default=0)
+    mouthType = models.IntegerField(default=0)
+    skinColor = models.IntegerField(default=0)
+    clotheColor = models.IntegerField(default=0)
+    style = models.IntegerField(default=0)
+    graphicType = models.IntegerField(default=0)
+
     def get_followers_count(self):
         return Follower.objects.filter(user=self.user).exclude(is_followed_by=self.user).count()
 
@@ -39,6 +54,23 @@ class Profile(models.Model):
 
     def get_email(self):
         return self.user
+
+    def get_avatar(self):
+        return {
+            "topType": self.topType,
+            "accessoriesType": self.accessoriesType,
+            "hairColor": self.hairColor,
+            "facialHairType": self.facialHairType,
+            "facialHairColor": self.facialHairColor,
+            "clotheType": self.clotheType,
+            "eyeType": self.eyeType,
+            "eyebrowType": self.eyebrowType,
+            "mouthType": self.mouthType,
+            "skinColor": self.skinColor,
+            "clotheColor": self.clotheColor,
+            "style": self.style,
+            "graphicType": self.graphicType
+        }
 
 
 class Follower(models.Model):

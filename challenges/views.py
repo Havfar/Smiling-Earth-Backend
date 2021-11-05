@@ -6,10 +6,12 @@ from rest_framework.response import Response
 from users.models import User
 from users.permissions import IsOwner
 
+import challenges
 from challenges.models import Challenge, ChallengeUser
 from challenges.serializers import (ChallengeDetailedSerializer,
                                     ChallengeSerializer,
-                                    ChallengeUserSerializer)
+                                    ChallengeUserSerializer,
+                                    ChallengeUserUpdateSerializer)
 
 
 class ChallengeList(generics.ListCreateAPIView):
@@ -32,7 +34,18 @@ class ChallengeUserList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return ChallengeUser.objects.filter(user=user)
+        user_challenges_qs = ChallengeUser.objects.filter(Q(user=user))
+        user_challenges = [
+            challenge for challenge in user_challenges_qs]
+
+        challenges = []
+        for challenge in user_challenges:
+            if(challenge.progress < challenge.challenge.goal):
+                challenges.append(challenge.id)
+
+        return ChallengeUser.objects.filter(Q(id__in=challenges))
+
+        # return ChallengeUser.objects.filter(user=user)
 
 
 class CompletedChallengeList(generics.ListCreateAPIView):
@@ -47,7 +60,7 @@ class CompletedChallengeList(generics.ListCreateAPIView):
 
         challenges = []
         for challenge in user_challenges:
-            if(challenge.progress == challenge.challenge.goal):
+            if(challenge.progress >= challenge.challenge.goal):
                 challenges.append(challenge.challenge.id)
 
         return Challenge.objects.filter(Q(id__in=challenges))
@@ -65,7 +78,7 @@ class MyCompletedChallengeList(generics.ListCreateAPIView):
 
         challenges = []
         for challenge in user_challenges:
-            if(challenge.progress == challenge.challenge.goal):
+            if(challenge.progress >= challenge.challenge.goal):
                 challenges.append(challenge.challenge.id)
 
         return Challenge.objects.filter(Q(id__in=challenges))
@@ -94,8 +107,13 @@ class ChallengeUserPost(generics.CreateAPIView):
 
 class ChallengeUserUpdateAndDelete(generics.UpdateAPIView, generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated and IsOwner]
-    serializer_class = ChallengeUserSerializer
+    serializer_class = ChallengeUserUpdateSerializer
     queryset = ChallengeUser.objects.all()
+
+    def get_object(self):
+        obj = get_object_or_404(ChallengeUser, user=self.request.user,
+                                challenge_id=self.kwargs['pk'])
+        return obj
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -106,6 +124,11 @@ class ChallengeUserUpdateAndDelete(generics.UpdateAPIView, generics.DestroyAPIVi
 
         if serializer.is_valid():
             serializer.save()
+            completed = instance.progress / instance.challenge.goal >= 1
+            if completed:
+                Post.objects.create(
+                    user=request.user, content="Completed the challenge", challenge=instance.challenge)
+
             return Response({"message": "Challenge user is updated", "challenge_user": {"id": instance.id, "score": instance.score, "progress": instance.progress}}, status=status.HTTP_200_OK)
 
         return Response({"message": "Could not update challenge", "details": serializer.errors})

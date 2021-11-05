@@ -17,6 +17,13 @@ class EmissionSerializer(ModelSerializer):
                   'isSourceTransport', 'year', 'month', 'weekNo']
 
 
+class UpdateEmissionSerializer(ModelSerializer):
+    class Meta:
+        model = Emission
+        fields = ['id', 'emissions',
+                  'isSourceTransport', 'year', 'month', 'weekNo']
+
+
 class TeamEmissionSerializer(ModelSerializer):
 
     class Meta:
