@@ -13,5 +13,5 @@ urlpatterns = [
 
 
     path('challenges/join/', views.ChallengeUserPost.as_view()),
-    path('challenge/user/<int:pk>', views.ChallengeUserUpdateAndDelete.as_view()),
+    path('challenge/user/<int:pk>/', views.ChallengeUserUpdateAndDelete.as_view()),
 ]

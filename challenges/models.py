@@ -12,12 +12,21 @@ class Challenge(models.Model):
     symbol = models.CharField(max_length=12)
     background_color = models.CharField(max_length=12)
     goal = models.IntegerField(default=0)
+    challenge_type = models.IntegerField(default=0)
+    challenge_type_feature = models.CharField(max_length=12, default='')
 
     def get_leaderboard(self):
         users_qs = ChallengeUser.objects.filter(
             challenge=self).order_by('-score')
         users = _ChallengeUserSerializer(instance=users_qs, many=True)
         return users.data
+
+    def get_challenge_type_feature(self):
+        features = []
+        for i in self.challenge_type_feature.split(','):
+            if i != '':
+                features.append(int(i))
+        return features
 
 
 class ChallengeUser(models.Model):
