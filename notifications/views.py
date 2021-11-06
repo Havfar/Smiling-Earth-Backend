@@ -1,6 +1,6 @@
 from django.db.models.query import QuerySet
 from django.shortcuts import render
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, response, status
 from rest_framework.response import Response
 
 from notifications.models import Notification
@@ -33,3 +33,14 @@ class NotificationsUpdate(generics.UpdateAPIView):
             serializer.save()
             return Response(status=status.HTTP_200_OK)
         return Response({"message": "Could not update notification", "details": serializer.errors})
+
+
+class CountUnReadNotifications(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    # def get_queryset(self):
+
+    def get(self, request, *args, **kwargs):
+        new_notification = Notification.objects.filter(
+            to_user=self.request.user).count()
+        return response.Response(data={'new_notifications': new_notification}, status=status.HTTP_200_OK)

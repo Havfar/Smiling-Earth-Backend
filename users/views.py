@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models.query_utils import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
+from notifications.models import Notification
 from rest_framework import generics, permissions, response, status
 
 from users.models import Follower, Profile, User
@@ -96,6 +97,7 @@ def follow(request, pk):
     if not already_followed:
         new_follower = Follower(user=user, is_followed_by=request.user)
         new_follower.save()
+        Notification.objects.create(from_user=request.user, to_user=user, notification_type= 3, follow=new_follower)
         follower_count = Follower.objects.filter(user=user).count()
         return JsonResponse({'status': 'Following', 'count': follower_count})
 
