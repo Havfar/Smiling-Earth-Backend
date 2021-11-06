@@ -1,0 +1,10 @@
+
+from rest_framework.serializers import ModelSerializer
+
+from notifications.models import Notification
+
+
+class NotificationSerializer(ModelSerializer):
+
+    class Meta:
+        model = Notification
