@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.fields import ReadOnlyField
 
 from teams.models import Member, Rival, Team
 
@@ -84,7 +85,7 @@ class RivalSerializer(serializers.ModelSerializer):
             'sender',
             'receiver',
             'status',
-            'team'
+            'team',
         ]
 
 

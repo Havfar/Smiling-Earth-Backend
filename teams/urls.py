@@ -9,6 +9,8 @@ urlpatterns = [
     path('teams/<int:pk>/', views.TeamDetail.as_view()),
     path('teams/users/<int:pk>/', views.UserTeamList.as_view()),
     path('teams/<int:pk>/emissions/', views.TeamEmissions.as_view()),
+    path('teams/<int:pk>/emissions/week/',
+         views.TeamEmissionsThisWeek.as_view()),
 
     path('teams/<int:pk>/members/', views.MembersOfTeam.as_view()),
     path('join_team/', views.Join.as_view()),

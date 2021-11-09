@@ -1,5 +1,6 @@
 from django.db.models.query_utils import Q
 from django.shortcuts import get_object_or_404
+from notifications.models import Notification
 from posts.models import Post
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
@@ -117,6 +118,7 @@ class ChallengeUserUpdateAndDelete(generics.UpdateAPIView, generics.DestroyAPIVi
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
+        previous_progress = instance.progress
         instance.score = request.data['score']
         instance.progress = request.data['progress']
         serializer = self.get_serializer(
@@ -124,10 +126,24 @@ class ChallengeUserUpdateAndDelete(generics.UpdateAPIView, generics.DestroyAPIVi
 
         if serializer.is_valid():
             serializer.save()
-            completed = instance.progress / instance.challenge.goal >= 1
+            progress_percentage = instance.progress / instance.challenge.goal
+            completed = progress_percentage >= 1
             if completed:
                 Post.objects.create(
                     user=request.user, content="Completed the challenge", challenge=instance.challenge)
+                Notification.objects.create(notification_type=2,
+                                            to_user=self.request.user,
+
+                                            message='You completed the challenge: ' + instance.challenge.title + ' 🎉')
+            elif previous_progress/instance.challenge.goal <= 0.9 and progress_percentage > 0.9:
+                Notification.objects.create(notification_type=2,
+                                            to_user=self.request.user,
+
+                                            message='Your almost finished with the task: ' + instance.challenge.title)
+            elif previous_progress/instance.challenge.goal <= 0.5 and progress_percentage > 0.5:
+                Notification.objects.create(notification_type=2,
+                                            to_user=self.request.user,
+                                            message='Your 50% finished with the task: ' + instance.challenge.title)
 
             return Response({"message": "Challenge user is updated", "challenge_user": {"id": instance.id, "score": instance.score, "progress": instance.progress}}, status=status.HTTP_200_OK)
 

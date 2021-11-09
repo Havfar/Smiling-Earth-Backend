@@ -1,5 +1,9 @@
+import datetime
+
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404
+from emissions.models import Emission
 from rest_framework import generics, mixins, permissions, status
 from rest_framework.response import Response
 from users.models import User
@@ -48,12 +52,44 @@ class TeamDetail(generics.RetrieveUpdateAPIView):
 
 
 class TeamEmissions(generics.ListAPIView):
-    serializer_class = MemberEmissionsSerializer
-    permission_classes = [permissions.IsAuthenticated, IsTeamAdmin]
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Emission.objects.all()
 
-    def get_queryset(self):
+    def get(self, request, *args, **kwargs):
         team = get_object_or_404(Team, pk=self.kwargs["pk"])
-        return Member.objects.filter(team=team)
+        members = Member.objects.filter(team=team)
+        members_ids = [member.user.pk for member in members]
+        emissions = Emission.objects.filter(Q(user__in=members_ids))
+        transportEmission = 0
+        energyEmission = 0
+        for emission in emissions:
+            if emission.isSourceTransport:
+                transportEmission += emission.emissions
+            else:
+                energyEmission += emission.emissions
+        return Response(data={"transport": transportEmission, "energy": energyEmission})
+
+
+class TeamEmissionsThisWeek(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Emission.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        team = get_object_or_404(Team, pk=self.kwargs["pk"])
+        members = Member.objects.filter(team=team)
+        members_ids = [member.user.pk for member in members]
+        today = datetime.date.today()
+        year, week_num, day_of_week = today.isocalendar()
+        emissions = Emission.objects.filter(
+            Q(user__in=members_ids), Q(weekNo=week_num))
+        transportEmission = 0
+        energyEmission = 0
+        for emission in emissions:
+            if emission.isSourceTransport:
+                transportEmission += emission.emissions
+            else:
+                energyEmission += emission.emissions
+        return Response(data={"transport": transportEmission, "energy": energyEmission})
 
 
 class MembersOfTeam(generics.ListCreateAPIView):

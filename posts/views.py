@@ -1,6 +1,7 @@
 from django.db.models import Q
 from django.http import request
 from django.shortcuts import get_object_or_404
+from notifications.models import Notification
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from teams.models import Team
@@ -79,6 +80,9 @@ class Likes(generics.CreateAPIView):
         user = request.user
         post = get_object_or_404(Post, pk=request.data['post'])
         like, created = Like.objects.get_or_create(user=user, post=post)
+        if created:
+            Notification.objects.create(notification_type=1, from_user=user,
+                                        to_user=post.user, post=post, message='new like', like=like)
         return Response(LikesSerializer(instance=like).data, status=status.HTTP_201_CREATED)
 
 
@@ -124,6 +128,8 @@ class NewComment (generics.CreateAPIView):
         content = request.data['content']
 
         comment = Comment.objects.create(user=user, post=post, content=content)
+        Notification.objects.create(notification_type=0, from_user=user,
+                                    to_user=post.user, post=post, message='new comment', comment=comment)
         return Response(CommentSerializer(instance=comment).data, status=status.HTTP_201_CREATED)
 
 
