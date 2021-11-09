@@ -4,13 +4,15 @@ from notifications.models import Notification
 from posts.models import Post
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from teams.models import Team
 from users.models import User
 from users.permissions import IsOwner
 
 import challenges
-from challenges.models import Challenge, ChallengeUser
+from challenges.models import Challenge, ChallengeTeam, ChallengeUser
 from challenges.serializers import (ChallengeDetailedSerializer,
                                     ChallengeSerializer,
+                                    ChallengeTeamSerializer,
                                     ChallengeUserSerializer,
                                     ChallengeUserUpdateSerializer)
 
@@ -25,7 +27,23 @@ class ChallengeList(generics.ListCreateAPIView):
         joined_challenges_qs = ChallengeUser.objects.filter(user=user)
         joined_challenges = [
             challenge.challenge.pk for challenge in joined_challenges_qs]
-        challenges = Challenge.objects.filter(~Q(id__in=joined_challenges))
+        challenges = Challenge.objects.filter(
+            ~Q(id__in=joined_challenges), Q(is_team_challenge=False))
+        return challenges
+
+
+class TeamChallengeList(generics.ListCreateAPIView):
+    queryset = Challenge.objects.all()
+    serializer_class = ChallengeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        team = get_object_or_404(Team, pk=self.kwargs['pk'])
+        joined_challenges_qs = ChallengeTeam.objects.filter(team=team)
+        joined_challenges = [
+            challenge.challenge.pk for challenge in joined_challenges_qs]
+        challenges = Challenge.objects.filter(
+            ~Q(id__in=joined_challenges), Q(is_team_challenge=True))
         return challenges
 
 
@@ -46,7 +64,23 @@ class ChallengeUserList(generics.ListCreateAPIView):
 
         return ChallengeUser.objects.filter(Q(id__in=challenges))
 
-        # return ChallengeUser.objects.filter(user=user)
+
+class TeamChallengeJoinedList(generics.ListCreateAPIView):
+    serializer_class = ChallengeTeamSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        team = get_object_or_404(Team, pk=self.kwargs['pk'])
+        team_challenges_qs = ChallengeTeam.objects.filter(Q(team=team))
+        team_challenges = [
+            challenge for challenge in team_challenges_qs]
+
+        challenges = []
+        for challenge in team_challenges:
+            if(challenge.progress < challenge.challenge.goal):
+                challenges.append(challenge.id)
+
+        return ChallengeTeam.objects.filter(Q(id__in=challenges))
 
 
 class CompletedChallengeList(generics.ListCreateAPIView):
@@ -61,6 +95,24 @@ class CompletedChallengeList(generics.ListCreateAPIView):
 
         challenges = []
         for challenge in user_challenges:
+            if(challenge.progress >= challenge.challenge.goal):
+                challenges.append(challenge.challenge.id)
+
+        return Challenge.objects.filter(Q(id__in=challenges))
+
+
+class CompletedTeamChallengeList(generics.ListCreateAPIView):
+    serializer_class = ChallengeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        team = get_object_or_404(Team, pk=self.kwargs['pk'])
+        team_challenges_qs = ChallengeTeam.objects.filter(Q(team=team))
+        team_challenges = [
+            challenge for challenge in team_challenges_qs]
+
+        challenges = []
+        for challenge in team_challenges:
             if(challenge.progress >= challenge.challenge.goal):
                 challenges.append(challenge.challenge.id)
 

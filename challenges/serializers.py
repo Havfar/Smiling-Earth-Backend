@@ -19,10 +19,18 @@ class ChallengeDetailedSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Challenge
         fields = ['id', 'title', 'description',
-                  'symbol', 'background_color', 'leaderboard']
+                  'symbol', 'background_color', 'is_team_challenge', 'leaderboard']
 
 
 class ChallengeUserSerializer(serializers.ModelSerializer):
+    challenge = ChallengeSerializer(read_only=True)
+
+    class Meta:
+        model = ChallengeUser
+        fields = ['id', 'score', 'progress', 'challenge']
+
+
+class ChallengeTeamSerializer(serializers.ModelSerializer):
     challenge = ChallengeSerializer(read_only=True)
 
     class Meta:
