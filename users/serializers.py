@@ -30,19 +30,21 @@ class AvatarSerializer(serializers.ModelSerializer):
 class MyProfileDetailedSerializer(serializers.ModelSerializer):
     followers_count = ReadOnlyField(source='get_followers_count')
     following_count = ReadOnlyField(source='get_following_count')
+    avatar = ReadOnlyField(source='get_avatar')
 
     class Meta:
         model = Profile
         fields = ['user_id', 'first_name', 'bio',
-                  'last_name', 'followers_count', 'following_count']
+                  'last_name', 'followers_count', 'following_count', 'avatar']
 
 
 class ProfileDetailedSerializer(serializers.ModelSerializer):
+    avatar = ReadOnlyField(source='get_avatar')
 
     class Meta:
         model = Profile
         fields = ['user_id', 'first_name', 'bio',
-                  'last_name']
+                  'last_name', 'avatar']
 
 
 class FollowerSerializer(serializers.ModelSerializer):

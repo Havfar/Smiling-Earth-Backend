@@ -158,6 +158,22 @@ class ChallengeUserPost(generics.CreateAPIView):
         return Response({"challenge user": {"id": challenge_user.id}}, status=status.HTTP_201_CREATED)
 
 
+class ChallengeTeamPost(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ChallengeUserSerializer
+
+    def create(self, request, *args, **kwargs):
+        challenge = get_object_or_404(Challenge, id=request.data['challenge'])
+        team = get_object_or_404(Team, id=request.data['team'])
+        challenge_team, created = ChallengeTeam.objects.get_or_create(
+            team=team, challenge=challenge, score=0, progress=0)
+
+        if created:
+            Post.objects.create(
+                user=request.user, content="Joined the challenge", challenge=challenge)
+        return Response({"challenge team": {"id": challenge_team.id}}, status=status.HTTP_201_CREATED)
+
+
 class ChallengeUserUpdateAndDelete(generics.UpdateAPIView, generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated and IsOwner]
     serializer_class = ChallengeUserUpdateSerializer
