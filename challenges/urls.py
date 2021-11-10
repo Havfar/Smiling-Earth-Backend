@@ -14,9 +14,13 @@ urlpatterns = [
     path('challenges/user/self/completed/',
          views.MyCompletedChallengeList.as_view()),
     path('challenges/join/', views.ChallengeUserPost.as_view()),
+    path('challenges/<int:pk>/leave/', views.ChallengeUserDelete.as_view()),
     path('challenges/team/join/',
          views.ChallengeTeamPost.as_view()),
     path('challenges/team/<int:pk>/joined/',
          views.TeamChallengeJoinedList.as_view()),
+    path('challenges/<int:challenge_pk>/team/<int:team_pk>/',
+         views.ChallengeTeamDelete.as_view()),
+
     path('challenge/user/<int:pk>/', views.ChallengeUserUpdateAndDelete.as_view()),
 ]

@@ -125,13 +125,18 @@ class Join(generics.CreateAPIView):
         return Response(MemberSerializer(instance=member).data, status=status.HTTP_201_CREATED)
 
 
-class Leave(mixins.DestroyModelMixin, generics.GenericAPIView):
-    serializer_class = LeaveTeamSerializer
-    queryset = Member.objects.all()
-    permission_classes = [permissions.IsAuthenticated, IsOwner]
+class Leave(generics.DestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
 
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
+    def destroy(self, request, *args, **kwargs):
+        team = get_object_or_404(Team, pk=self.kwargs["pk"])
+        user = request.user
+
+        member = get_object_or_404(
+            Member, Q(user=user, team=team))
+        member.delete()
+        # Member.objects.delete(Q(user=request.user, team=request.data['team']))
+        return Response(status=status.HTTP_200_OK)
 
 
 class Rivals(generics.ListCreateAPIView, generics.UpdateAPIView):

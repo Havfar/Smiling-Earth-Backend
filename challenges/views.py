@@ -155,7 +155,21 @@ class ChallengeUserPost(generics.CreateAPIView):
         if created:
             Post.objects.create(
                 user=request.user, content="Joined the challenge", challenge=challenge)
-        return Response({"challenge user": {"id": challenge_user.id}}, status=status.HTTP_201_CREATED)
+        return Response({"challenge user": {"id": challenge_user.id}}, status=status.HTTP_200_OK)
+
+
+class ChallengeUserDelete(generics.DestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def destroy(self, request, *args, **kwargs):
+        challenge = get_object_or_404(Challenge, pk=self.kwargs["pk"])
+        user = request.user
+
+        challenge = get_object_or_404(
+            ChallengeUser, Q(user=user, challenge=challenge))
+        challenge.delete()
+        # Member.objects.delete(Q(user=request.user, team=request.data['team']))
+        return Response(status=status.HTTP_200_OK)
 
 
 class ChallengeTeamPost(generics.CreateAPIView):
@@ -171,7 +185,24 @@ class ChallengeTeamPost(generics.CreateAPIView):
         if created:
             Post.objects.create(
                 user=request.user, content="Joined the challenge", challenge=challenge)
-        return Response({"challenge team": {"id": challenge_team.id}}, status=status.HTTP_201_CREATED)
+        return Response({"challenge team": {"id": challenge_team.id}}, status=status.HTTP_200_OK)
+
+
+class ChallengeTeamDelete(generics.DestroyAPIView):
+    # Todo: add permission is_team_member
+    permission_classes = [permissions.IsAuthenticated]
+
+    def destroy(self, request, *args, **kwargs):
+        challenge = get_object_or_404(
+            Challenge, pk=self.kwargs["challenge_pk"])
+
+        team = get_object_or_404(Team, pk=self.kwargs["team_pk"])
+
+        challenge = get_object_or_404(
+            ChallengeTeam, Q(team=team, challenge=challenge))
+        challenge.delete()
+        # Member.objects.delete(Q(user=request.user, team=request.data['team']))
+        return Response(status=status.HTTP_200_OK)
 
 
 class ChallengeUserUpdateAndDelete(generics.UpdateAPIView, generics.DestroyAPIView):
