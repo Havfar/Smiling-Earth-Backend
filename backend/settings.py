@@ -46,10 +46,23 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 SECRET_KEY = 'b-w74a)e_t%jzlsm8t=*)_%rfz%mv8@*c#8ui4bjas)#jfvtc='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
+# Local
+# DEBUG = True
+# ALLOWED_HOST = []
 
 # ALLOWED_HOST = ['0.0.0.0', '192.168.1.222']
-ALLOWED_HOST = []
+
+
+# # Azure
+# DEBUG = False
+DEBUG = os.getenv("DEBUG")
+
+ALLOWED_HOSTS = []
+if not DEBUG:
+    ALLOWED_HOSTS = [os.getenv('WEBSITE_HOSTNAME')]
+
+# ALLOWED_HOSTS = ['smiling-earth.azurewebsites.net']
 
 # Application definition
 
@@ -108,8 +121,19 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {}
-DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+# DATABASES = {}
+# DATABASES['default'] = {dj_database_url.config(conn_max_age=600)}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'django',
+        'USER': 'havfar',
+        'PASSWORD': os.getenv("DB_PASSWORD"),
+        'HOST': 'smiling-earth-backend.postgres.database.azure.com',
+        'PORT': '5432',
+        "OPTIONS": {"sslmode": "require"},
+    }
+}
 
 
 # Password validation
@@ -155,12 +179,12 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Configure Django App for Heroku.
-django_heroku.settings(locals())
+# # Configure Django App for Heroku.
+# django_heroku.settings(locals())
 
-# SSL issue workaround for local development
-# (https://blog.usejournal.com/deploying-django-to-heroku-connecting-heroku-postgres-fcc960d290d1)
-options = DATABASES['default'].get('OPTIONS', {})
-options.pop('sslmode', None)
+# # SSL issue workaround for local development
+# # (https://blog.usejournal.com/deploying-django-to-heroku-connecting-heroku-postgres-fcc960d290d1)
+# options = DATABASES['default'].get('OPTIONS', {})
+# options.pop('sslmode', None)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

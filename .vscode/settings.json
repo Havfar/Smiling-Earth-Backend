@@ -1,0 +1,4 @@
+{
+  "appService.defaultWebAppToDeploy": "/subscriptions/0bcf3684-a60a-4761-b469-3558d1eda82c/resourceGroups/smiling-earth/providers/Microsoft.Web/sites/smiling-earth",
+  "appService.deploySubpath": "."
+}
