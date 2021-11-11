@@ -167,7 +167,7 @@ class NotRivals(generics.ListCreateAPIView):
         return Team.objects.filter(~Q(id__in=rival_teams_id))
 
 
-class NewRivalRequests(generics.CreateAPIView):
+class NewRivalRequest(generics.CreateAPIView):
     serializer_class = RivalSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = Rival.objects.all()
@@ -188,10 +188,10 @@ class RivalRequests(generics.ListAPIView):
 
     def get_queryset(self):
         team = get_object_or_404(Team, pk=self.kwargs["pk"])
-        return Rival.objects.filter(Q(sender=team) | Q(receiver=team), Q(status='p')
-                                    )
+        return Rival.objects.filter(Q(sender=team) | Q(receiver=team), Q(status='p'))
 
 
 class RivalUpdateAndDeleteRequests(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RivalSerializer
     permission_classes = [permissions.IsAuthenticated]
+    queryset = Rival.objects.all()

@@ -16,10 +16,8 @@ urlpatterns = [
     path('teams/<int:pk>/leave/', views.Leave.as_view()),
     path('rivals/<int:pk>/', views.Rivals.as_view()),
     path('rivals/<int:pk>/other/', views.NotRivals.as_view()),
-    path('rival_requests/new/', views.NewRivalRequests.as_view()),
+    path('rival_requests/new/', views.NewRivalRequest.as_view()),
     path('rival_requests/<int:pk>/', views.RivalRequests.as_view()),
     path('rival_requests/<int:pk>/update/',
          views.RivalUpdateAndDeleteRequests.as_view()),
-
-
 ]
