@@ -1,5 +1,8 @@
 from django.db import models
 from rest_framework import serializers
+from teams.models import Rival, Team
+from teams.serializers import TeamSerializer
+from teams.views import Rivals
 from users.models import Profile, User
 from users.serializers import ProfileSerializer
 
@@ -12,10 +15,17 @@ class Challenge(models.Model):
     symbol = models.CharField(max_length=12)
     background_color = models.CharField(max_length=12)
     goal = models.IntegerField(default=0)
+    is_team_challenge = models.BooleanField(default=False)
     challenge_type = models.IntegerField(default=0)
     challenge_type_feature = models.CharField(max_length=12, default='')
 
     def get_leaderboard(self):
+        if self.is_team_challenge:
+            teams_qs = ChallengeTeam.objects.filter(
+                challenge=self).order_by('-score')
+            teams = _ChallengeTeamSerializer(instance=teams_qs, many=True)
+            return teams.data
+
         users_qs = ChallengeUser.objects.filter(
             challenge=self).order_by('-score')
         users = _ChallengeUserSerializer(instance=users_qs, many=True)
@@ -45,6 +55,16 @@ class ChallengeUser(models.Model):
         return serializer.data
 
 
+class ChallengeTeam(models.Model):
+    team = models.ForeignKey(
+        Team, on_delete=models.CASCADE, related_name='challenge_team')
+    challenge = models.ForeignKey(
+        Challenge, on_delete=models.CASCADE, related_name='challenge_challenge_team')
+    timestamp = models.DateTimeField(auto_now_add=True)
+    score = models.IntegerField(auto_created=True, default=0)
+    progress = models.IntegerField(auto_created=True, default=0)
+
+
 # Private serializer to prevent circular import error
 class _ChallengeUserSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='get_user_profile')
@@ -52,3 +72,14 @@ class _ChallengeUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChallengeUser
         fields = ['id', 'user', 'score', 'progress']
+
+# Private serializer to prevent circular import error
+
+
+class _ChallengeTeamSerializer(serializers.ModelSerializer):
+    # user = serializers.ReadOnlyField(source='get_user_profile')
+    team = TeamSerializer(read_only=True)
+
+    class Meta:
+        model = ChallengeUser
+        fields = ['id', 'team', 'score', 'progress']

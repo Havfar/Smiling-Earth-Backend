@@ -82,10 +82,11 @@ class NotFollowingList(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        followers = Follower.objects.filter(is_followed_by=self.request.user)
-        users = [user.pk for user in followers]
+        followers = Follower.objects.filter(
+            Q(is_followed_by=self.request.user))
+        users = [follower.user.id for follower in followers]
 
-        return Profile.objects.filter(~Q(user_id__in=users))
+        return Profile.objects.filter(~Q(user_id__in=users), ~Q(user_id=self.request.user.id))
 
 
 @login_required
@@ -97,7 +98,8 @@ def follow(request, pk):
     if not already_followed:
         new_follower = Follower(user=user, is_followed_by=request.user)
         new_follower.save()
-        Notification.objects.create(from_user=request.user, to_user=user, notification_type= 3, follow=new_follower)
+        Notification.objects.create(
+            from_user=request.user, to_user=user, notification_type=3, follow=new_follower)
         follower_count = Follower.objects.filter(user=user).count()
         return JsonResponse({'status': 'Following', 'count': follower_count})
 

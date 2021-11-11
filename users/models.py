@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+from rest_framework.fields import ReadOnlyField
 
 from .managers import CustomUserManager
 
@@ -113,6 +114,8 @@ class Follower(models.Model):
 
 # Private serializer to prevent circular import error
 class _ProfileSerializer(serializers.ModelSerializer):
+    avatar = ReadOnlyField(source='get_avatar')
+
     class Meta:
         model = Profile
-        fields = ['user_id', 'first_name', 'last_name']
+        fields = ['user_id', 'first_name', 'last_name', 'avatar']

@@ -76,7 +76,7 @@ class LeaveTeamSerializer(serializers.ModelSerializer):
 class RivalSerializer(serializers.ModelSerializer):
     sender = TeamSerializer(read_only=True)
     receiver = TeamSerializer(read_only=True)
-    team = TeamSerializer(read_only=True, source='get_rival')
+    # team = TeamSerializer(read_only=True, source='get_rival')
 
     class Meta:
         model = Rival
@@ -85,7 +85,7 @@ class RivalSerializer(serializers.ModelSerializer):
             'sender',
             'receiver',
             'status',
-            'team',
+            # 'team',
         ]
 
 

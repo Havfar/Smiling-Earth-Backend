@@ -125,13 +125,18 @@ class Join(generics.CreateAPIView):
         return Response(MemberSerializer(instance=member).data, status=status.HTTP_201_CREATED)
 
 
-class Leave(mixins.DestroyModelMixin, generics.GenericAPIView):
-    serializer_class = LeaveTeamSerializer
-    queryset = Member.objects.all()
-    permission_classes = [permissions.IsAuthenticated, IsOwner]
+class Leave(generics.DestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
 
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
+    def destroy(self, request, *args, **kwargs):
+        team = get_object_or_404(Team, pk=self.kwargs["pk"])
+        user = request.user
+
+        member = get_object_or_404(
+            Member, Q(user=user, team=team))
+        member.delete()
+        # Member.objects.delete(Q(user=request.user, team=request.data['team']))
+        return Response(status=status.HTTP_200_OK)
 
 
 class Rivals(generics.ListCreateAPIView, generics.UpdateAPIView):
@@ -144,18 +149,49 @@ class Rivals(generics.ListCreateAPIView, generics.UpdateAPIView):
         return Rival.objects.filter(Q(sender=team) | Q(receiver=team), Q(status='a'))
 
 
-class RivalRequests(generics.RetrieveUpdateAPIView):
+class NotRivals(generics.ListCreateAPIView):
+    serializer_class = TeamSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        team = get_object_or_404(Team, pk=self.kwargs["pk"])
+        rivals = Rival.objects.filter(Q(sender=team) | Q(receiver=team))
+        rival_teams_id = []
+        rival_teams_id.append(team.id)
+        for rival in rivals:
+            if rival.sender == team:
+                rival_teams_id.append(rival.receiver.id)
+            else:
+                rival_teams_id.append(rival.sender.id)
+
+        return Team.objects.filter(~Q(id__in=rival_teams_id))
+
+
+class NewRivalRequest(generics.CreateAPIView):
+    serializer_class = RivalSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Rival.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        sender = get_object_or_404(Team, pk=request.data['sender'])
+        receiver = get_object_or_404(Team, pk=request.data['receiver'])
+
+        rival, created = Rival.objects.get_or_create(
+            receiver=receiver, sender=sender, status='p')
+
+        return Response(RivalSerializer(instance=rival).data, status=status.HTTP_201_CREATED)
+
+
+class RivalRequests(generics.ListAPIView):
     serializer_class = RivalSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         team = get_object_or_404(Team, pk=self.kwargs["pk"])
-        return Rival.objects.filter(Q(receiver=team), Q(status='p'))
+        return Rival.objects.filter(Q(sender=team) | Q(receiver=team), Q(status='p'))
 
 
-# class GetRivalsEmission(generics.ListAPIView):
-#     serializer_class = RivalEmissionSerializer
-
-#     def get_queryset(self):
-#         team = get_object_or_404(Team, pk=self.kwargs["pk"])
-#         return Rival.objects.filter(Q(receiver=team), Q(status='p'))
+class RivalUpdateAndDeleteRequests(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = RivalSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Rival.objects.all()
