@@ -58,8 +58,9 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # DEBUG = False
 DEBUG = (bool(int(os.environ.get('DEBUG', 1))))
 
-ALLOWED_HOSTS = []
-if not DEBUG:
+if DEBUG:
+    ALLOWED_HOSTS = []
+else:
     ALLOWED_HOSTS = [os.getenv('WEBSITE_HOSTNAME')]
 
 # ALLOWED_HOSTS = ['smiling-earth.azurewebsites.net']
