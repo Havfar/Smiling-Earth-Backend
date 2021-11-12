@@ -166,8 +166,8 @@ REST_FRAMEWORK = {
 }
 
 # https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
