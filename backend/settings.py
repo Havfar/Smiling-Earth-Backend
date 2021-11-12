@@ -43,7 +43,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'b-w74a)e_t%jzlsm8t=*)_%rfz%mv8@*c#8ui4bjas)#jfvtc='
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -56,7 +56,7 @@ SECRET_KEY = 'b-w74a)e_t%jzlsm8t=*)_%rfz%mv8@*c#8ui4bjas)#jfvtc='
 
 # # Azure
 # DEBUG = False
-DEBUG = os.getenv("DEBUG")
+DEBUG = (bool(int(os.environ.get('DEBUG', 1))))
 
 ALLOWED_HOSTS = []
 if not DEBUG:
@@ -156,7 +156,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 15,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
     ),
@@ -164,6 +164,10 @@ REST_FRAMEWORK = {
     #     'rest_framework.permissions.IsAuthenticated',
     # ],
 }
+
+# https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
