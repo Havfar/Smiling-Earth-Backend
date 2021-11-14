@@ -26,12 +26,14 @@ class PostDetailedSerializer(ModelSerializer):
     content = serializers.CharField()
     likes = serializers.ReadOnlyField(source="get_likes")
     comments = serializers.ReadOnlyField(source="get_comments")
+    activity = serializers.ReadOnlyField(source="get_activity", required=False)
+    challenge = ChallengeSerializer(read_only=True)
 
     class Meta:
         depth = 1
         model = Post
         fields = ["id", "user", "content", "timestamp",
-                  "likes", "comments"]
+                  "likes", "comments", "activity", "challenge"]
 
 
 class LikesSerializer(ModelSerializer):

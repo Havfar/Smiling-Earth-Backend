@@ -1,4 +1,6 @@
 from activities import serializers
+from django.db.models.fields import BooleanField
+from rest_framework.fields import ReadOnlyField
 from rest_framework.serializers import ModelSerializer
 
 from pledge.models import Pledge, TeamPledge, UserPledge
