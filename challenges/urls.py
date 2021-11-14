@@ -21,6 +21,8 @@ urlpatterns = [
          views.TeamChallengeJoinedList.as_view()),
     path('challenges/<int:challenge_pk>/team/<int:team_pk>/',
          views.ChallengeTeamDelete.as_view()),
-
+    path('challenges/<int:pk>/progress/', views.UserProgress.as_view()),
+    path('challenges/<int:challenge_pk>/team/<int:team_pk>/progress/',
+         views.TeamProgress.as_view()),
     path('challenge/user/<int:pk>/', views.ChallengeUserUpdateAndDelete.as_view()),
 ]

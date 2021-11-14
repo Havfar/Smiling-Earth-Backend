@@ -65,6 +65,33 @@ class ChallengeUserList(generics.ListCreateAPIView):
         return ChallengeUser.objects.filter(Q(id__in=challenges))
 
 
+class UserProgress(generics.ListCreateAPIView):
+    # serializer_class = ChallengeUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+        challenge = get_object_or_404(Challenge, pk=self.kwargs['pk'])
+        user_challenge = ChallengeUser.objects.get(
+            Q(user=user), Q(challenge=challenge))
+
+        return Response({"progress": user_challenge.progress, 'score': user_challenge.score, 'goal': challenge.goal}, status=status.HTTP_200_OK)
+
+
+class TeamProgress(generics.ListCreateAPIView):
+    # serializer_class = ChallengeUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        team = get_object_or_404(Team, pk=self.kwargs['team_pk'])
+        challenge = get_object_or_404(
+            Challenge, pk=self.kwargs['challenge_pk'])
+        team_challenge = ChallengeTeam.objects.get(
+            Q(team=team), Q(challenge=challenge))
+
+        return Response({"progress": team_challenge.progress, 'score': team_challenge.score, 'goal': challenge.goal}, status=status.HTTP_200_OK)
+
+
 class TeamChallengeJoinedList(generics.ListCreateAPIView):
     serializer_class = ChallengeTeamSerializer
     permission_classes = [permissions.IsAuthenticated]
