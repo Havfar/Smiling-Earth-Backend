@@ -15,11 +15,12 @@ class TeamSerializer(serializers.ModelSerializer):
 
 class TeamDetailSerializer(serializers.ModelSerializer):
     emissions = serializers.ReadOnlyField(source='get_team_detailed_emission')
+    members_count = serializers.IntegerField(source='get_members_count')
 
     class Meta:
         model = Team
         fields = ['id', 'name', 'symbol',
-                  'description', 'location', 'emissions']
+                  'description', 'location', 'emissions', 'members_count']
 
 
 class MemberSerializer(serializers.ModelSerializer):

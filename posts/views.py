@@ -23,19 +23,20 @@ class PostList(generics.ListCreateAPIView):
         return get_posts_queryset(self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        if self.request.data['team_id'] is not None:
+            team = get_object_or_404(Team, pk=self.request.data['team_id'])
+            serializer.save(user=self.request.user, team=team)
+        else:
+            serializer.save(user=self.request.user)
 
 
-class TeamPostList(generics.ListCreateAPIView):
+class TeamPostList(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = PostSerializer
 
     def get_queryset(self):
         team = get_object_or_404(Team, pk=self.kwargs['pk'])
         return Post.objects.filter(Q(team=team))
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
 
 
 class UserPostList(generics.ListAPIView):
@@ -165,5 +166,7 @@ def get_posts_queryset(user):
     followers_qs.append(user.pk)
     # Todo: legg inn user i queryset
     queryset = Post.objects.filter(
-        user__pk__in=followers_qs)
+        Q(user__pk__in=followers_qs),
+        Q(team_id=None)
+    )
     return queryset
