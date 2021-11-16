@@ -211,7 +211,7 @@ class ChallengeTeamPost(generics.CreateAPIView):
 
         if created:
             Post.objects.create(
-                user=request.user, content="Joined the challenge", challenge=challenge)
+                user=request.user, content="Joined the challenge", challenge=challenge, team=team)
         return Response({"challenge team": {"id": challenge_team.id}}, status=status.HTTP_200_OK)
 
 
