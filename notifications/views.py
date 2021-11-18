@@ -42,5 +42,5 @@ class CountUnReadNotifications(generics.ListAPIView):
 
     def get(self, request, *args, **kwargs):
         new_notification = Notification.objects.filter(
-            to_user=self.request.user).count()
+            to_user=self.request.user, user_has_seen=False).count()
         return response.Response(data={'new_notifications': new_notification}, status=status.HTTP_200_OK)

@@ -1,5 +1,6 @@
 import datetime
 
+from django.apps import apps
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404
@@ -121,6 +122,11 @@ class Join(generics.CreateAPIView):
         team = get_object_or_404(Team, pk=request.data['team'])
 
         member, created = Member.objects.get_or_create(user=user, team=team)
+        if created:
+            post = apps.get_model('posts', 'Post')
+
+            post.objects.create(
+                user=request.user, content="Joined the team", team=team)
 
         return Response(MemberSerializer(instance=member).data, status=status.HTTP_201_CREATED)
 
@@ -178,6 +184,12 @@ class NewRivalRequest(generics.CreateAPIView):
 
         rival, created = Rival.objects.get_or_create(
             receiver=receiver, sender=sender, status='p')
+
+        # if created:
+        #     post = apps.get_model('posts', 'Post')
+
+        #     post.objects.create(
+        #         user=request.user, content="Joined the team", team=team)
 
         return Response(RivalSerializer(instance=rival).data, status=status.HTTP_201_CREATED)
 

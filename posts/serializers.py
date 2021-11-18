@@ -18,7 +18,7 @@ class PostSerializer(ModelSerializer):
         depth = 1
         model = Post
         fields = ["id", "user", "content", "timestamp",
-                  "likes_count", "comments_count", "activity", "challenge"]
+                  "likes_count", "comments_count", "activity", "challenge", "team_id"]
 
 
 class PostDetailedSerializer(ModelSerializer):

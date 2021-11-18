@@ -1,6 +1,6 @@
 from django.db import models
 from rest_framework import serializers
-from teams.models import Rival, Team
+from teams.models import Member, Rival, Team
 from teams.serializers import TeamSerializer
 from teams.views import Rivals
 from users.models import Profile, User
@@ -16,6 +16,8 @@ class Challenge(models.Model):
     background_color = models.CharField(max_length=12)
     goal = models.IntegerField(default=0)
     is_team_challenge = models.BooleanField(default=False)
+    team_challenge_relation = models.ForeignKey(
+        'self', blank=True, on_delete=models.CASCADE, null=True)
     challenge_type = models.IntegerField(default=0)
     challenge_type_feature = models.CharField(max_length=12, default='')
 

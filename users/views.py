@@ -89,20 +89,28 @@ class NotFollowingList(generics.ListAPIView):
         return Profile.objects.filter(~Q(user_id__in=users), ~Q(user_id=self.request.user.id))
 
 
-@login_required
-def follow(request, pk):
-    user = get_object_or_404(User, pk=pk)
-    already_followed = Follower.objects.filter(
-        user=user, is_followed_by=request.user).first()
+class Follow(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
 
-    if not already_followed:
-        new_follower = Follower(user=user, is_followed_by=request.user)
-        new_follower.save()
-        Notification.objects.create(
-            from_user=request.user, to_user=user, notification_type=3, follow=new_follower)
-        follower_count = Follower.objects.filter(user=user).count()
-        return JsonResponse({'status': 'Following', 'count': follower_count})
+    def create(self, request, *args, **kwargs):
+        followed_by = request.user
+        user = get_object_or_404(User, pk=kwargs["pk"])
+        new_follower, created = Follower.objects.get_or_create(
+            user=user, is_followed_by=followed_by)
+        if created:
+            Notification.objects.create(
+                from_user=request.user, to_user=user, notification_type=3, follow=new_follower)
 
-    already_followed.delete()
-    follower_count = Follower.objects.filter(user=user).count()
-    return JsonResponse({'status': 'Not following', 'count': follower_count})
+        return response.Response(status=200)
+
+
+class Unfollow(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        followed_by = request.user
+        user = get_object_or_404(User, pk=kwargs["pk"])
+        follow = get_object_or_404(
+            Follower, user=user, is_followed_by=followed_by)
+        follow.delete()
+        return response.Response(status=200)
