@@ -1,10 +1,12 @@
+import math
+
 from django.db.models.query_utils import Q
 from django.shortcuts import get_object_or_404
 from notifications.models import Notification
 from posts.models import Post
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from teams.models import Team
+from teams.models import Member, Team
 from users.models import User
 from users.permissions import IsOwner
 
@@ -86,10 +88,27 @@ class TeamProgress(generics.ListCreateAPIView):
         team = get_object_or_404(Team, pk=self.kwargs['team_pk'])
         challenge = get_object_or_404(
             Challenge, pk=self.kwargs['challenge_pk'])
-        team_challenge = ChallengeTeam.objects.get(
-            Q(team=team), Q(challenge=challenge))
 
-        return Response({"progress": team_challenge.progress, 'score': team_challenge.score, 'goal': challenge.goal}, status=status.HTTP_200_OK)
+        related_user_challenge = challenge.team_challenge_relation
+
+        progress = 0
+        counter = 0
+
+        team_members = Member.objects.filter(team=team)
+        for member in team_members:
+            user_challenge = ChallengeUser.objects.filter(
+                user=member.user, challenge=related_user_challenge)
+            for result in user_challenge:
+                progress += result.progress
+                counter += 1
+
+        # team_challenge = ChallengeTeam.objects.get(
+        #     Q(team=team), Q(challenge=challenge))
+        if counter == 0:
+            counter = 1
+
+        average_progress = math.ceil(progress/counter)
+        return Response({"progress": average_progress, 'score': average_progress, 'goal': challenge.goal}, status=status.HTTP_200_OK)
 
 
 class TeamChallengeJoinedList(generics.ListCreateAPIView):
