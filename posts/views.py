@@ -26,6 +26,9 @@ class PostList(generics.ListCreateAPIView):
         if self.request.data['team_id'] is not None:
             team = get_object_or_404(Team, pk=self.request.data['team_id'])
             serializer.save(user=self.request.user, team=team)
+        # elif self.request.data['activity_id'] is not None:
+        #     activity = get_object_or_404(Activity, pk=self.request.data['team_id'])
+        #     serializer.save(user=self.request.user, team=team)
         else:
             serializer.save(user=self.request.user)
 
