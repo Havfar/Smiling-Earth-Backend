@@ -34,7 +34,7 @@ class UpdateOrCreateUserEmission(generics.CreateAPIView):
                 else:
                     emission.emissions = data["emissions"][1]["emission"]
                 emission.save()
-                return response.Response(status=status.HTTP_200_OK, data={"message": "emission updated successfully"})
+            return response.Response(status=status.HTTP_200_OK, data={"message": "emission updated successfully"})
         else:
             transport_emission = Emission(
                 user=self.request.user,
@@ -49,7 +49,7 @@ class UpdateOrCreateUserEmission(generics.CreateAPIView):
                 month=data["month"],
                 year=data["year"],
                 weekNo=data["weekNo"],
-                emissions=data["emissions"][0]["emission"],
+                emissions=data["emissions"][1]["emission"],
                 isSourceTransport=False)
             Emission.objects.bulk_create([transport_emission, energy_emission])
             return response.Response(status=status.HTTP_200_OK, data={"message": "emission created successfully"})
