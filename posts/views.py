@@ -163,13 +163,12 @@ class CommentList(generics.ListAPIView):
 
 
 def get_posts_queryset(user):
-    # follower = Follower.objects.filter(user=user)
     follower = Follower.objects.filter(is_followed_by=user)
-    followers = (user for user in follower)
-    followers_qs = [user.pk for user in followers]
+    followers_qs = [follow.user.pk for follow in follower]
     followers_qs.append(user.pk)
     queryset = Post.objects.filter(
         Q(user__pk__in=followers_qs),
         Q(team_id=None)
     )
+
     return queryset
