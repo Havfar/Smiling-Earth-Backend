@@ -275,7 +275,7 @@ class ChallengeUserUpdateAndDelete(generics.UpdateAPIView, generics.DestroyAPIVi
             completed = progress_percentage >= 1
             if completed:
                 Post.objects.create(
-                    user=request.user, content="Completed the challenge", challenge=instance.challenge)
+                    user=request.user, content="Completed a challenge! 🎉", challenge=instance.challenge)
                 Notification.objects.create(notification_type=2,
                                             to_user=self.request.user,
 
