@@ -1,7 +1,7 @@
-# Smiling-Earth-Backend
+# Smiling-Earth-Backend 🌎
 Smiling Earth is the backend application running the Django Rest API. For the frontend applicaiton see  **[Smiling Earth Frontend](https://github.com/Havfar/Smiling-Earth)**.
 
-# Getting Started - Local setup
+## Getting Started - Local setup
 It's recommended to have a look at the Django REST guide: https://www.django-rest-framework.org/
 
 1. Create a virtualenv https://docs.python-guide.org/dev/virtualenvs/
